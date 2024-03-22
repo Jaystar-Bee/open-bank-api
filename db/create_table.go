@@ -1,5 +1,7 @@
 package db
 
+import "fmt"
+
 func CreateTables() {
 
 	userTable := `
@@ -11,7 +13,7 @@ func CreateTables() {
 			password TEXT NOT NULL,
 			transaction_pin TEXT NOT NULL,
 			tag TEXT UNIQUE NOT NULL,
-			phone TEXT UNIQUE,
+			phone TEXT,
 			is_verified BOOLEAN NOT NULL,
 			created_at TEXT,
 			updated_at TEXT,
@@ -24,18 +26,20 @@ func CreateTables() {
 	}
 
 	walletTable := `
-		CREATE TABLE IF NOT EXISTS wallets (
+		CREATE TABLE IF NOT EXISTS wallets(
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			user_id INTEGER NOT NULL,
-			balance INTEGER NOT NULL,
+			user_id INTEGER UNIQUE NOT NULL,
+			balance FLOAT NOT NULL,
 			created_at TEXT,
 			updated_at TEXT,
 			deleted_at TEXT,
 			FOREIGN KEY (user_id) REFERENCES users(id)
-			`
+		)
+	`
 
 	_, err = MainDB.Exec(walletTable)
 	if err != nil {
+		fmt.Println("wallet table")
 		panic(err)
 	}
 
