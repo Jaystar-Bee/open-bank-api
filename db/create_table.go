@@ -8,10 +8,10 @@ func CreateTables() {
 			first_name TEXT NOT NULL,
 			last_name TEXT NOT NULL,
 			email TEXT UNIQUE NOT NULL,
-			password TEXT,
-			transaction_pin: TEXT NOT NULL,
+			password TEXT NOT NULL,
+			transaction_pin TEXT NOT NULL,
 			tag TEXT UNIQUE NOT NULL,
-			phone TEXT UNIQUE NOT NULL,
+			phone TEXT UNIQUE,
 			is_verified BOOLEAN NOT NULL,
 			created_at TEXT,
 			updated_at TEXT,
@@ -33,6 +33,7 @@ func CreateTables() {
 			deleted_at TEXT,
 			FOREIGN KEY (user_id) REFERENCES users(id)
 			`
+
 	_, err = MainDB.Exec(walletTable)
 	if err != nil {
 		panic(err)

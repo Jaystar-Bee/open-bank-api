@@ -26,4 +26,16 @@ func CreateUser(context *gin.Context) {
 		})
 		return
 	}
+
+	err = user.Save()
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{
+			"message":    "Unable to process request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+	context.JSON(http.StatusOK, gin.H{
+		"message": "User created successfully",
+	})
 }
