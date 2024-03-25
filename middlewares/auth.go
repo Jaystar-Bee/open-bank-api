@@ -14,6 +14,7 @@ func CheckAuthentication(context *gin.Context) {
 
 	if token == "" {
 		context.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
+		return
 	}
 
 	token = strings.Split(token, "Bearer ")[1]
@@ -22,14 +23,17 @@ func CheckAuthentication(context *gin.Context) {
 
 	if err != nil {
 		context.AbortWithStatusJSON(http.StatusForbidden, gin.H{"message": "Unauthorized"})
+		return
 	}
-
 	expireTime := int64(claimsData["ExpiredAt"].(float64))
-
 	if expireTime < time.Now().Unix() {
 		context.AbortWithStatusJSON(http.StatusForbidden, gin.H{"message": "session timeout"})
+		return
 	}
+	user := claimsData["userId"].(float64)
+	email := claimsData["email"].(string)
 
-	context.Set("user", claimsData["user"])
+	context.Set("user", user)
+	context.Set("email", email)
 	context.Next()
 }

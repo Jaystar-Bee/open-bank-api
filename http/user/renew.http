@@ -1,0 +1,2 @@
+GET http://localhost:8080/user/renew
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFeHBpcmVkQXQiOjE3MTE0NTU3MTMsImVtYWlsIjoiYW1qYXlzdGFyQGdtYWlsLmNvbSIsInVzZXJJZCI6MX0.vNLOEKzefJQEIitY-BmwdciSc_uGvWSh-0kLr1qPRws

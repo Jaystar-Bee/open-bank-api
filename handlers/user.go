@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/Jaystar-Bee/open-bank-api/jwt"
 	"github.com/Jaystar-Bee/open-bank-api/models"
@@ -94,7 +95,7 @@ func Login(context *gin.Context) {
 	}
 
 	// GENERATE TOKEN
-	token, err := jwt.GenerateJWT(*user)
+	token, err := jwt.GenerateJWT(user.ID, user.Email, time.Now().Add(time.Hour*24).Unix())
 	if err != nil {
 		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"message":    "Unable to generate token",
@@ -115,6 +116,33 @@ func Login(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{
 		"message": "User logged in successfully",
 		"data":    user,
+		"token":   token,
+	})
+
+}
+
+func RenewToken(context *gin.Context) {
+	email := context.GetString("email")
+
+	user, err := models.GetUserByEmail(email)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+			"message": "Unable to find user",
+		})
+		return
+	}
+
+	token, err := jwt.GenerateJWT(user.ID, user.Email, time.Now().Add(time.Hour*6).Unix())
+
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message":    "Unable to generate token",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+	context.JSON(http.StatusOK, gin.H{
+		"message": "Token renewed successfully",
 		"token":   token,
 	})
 

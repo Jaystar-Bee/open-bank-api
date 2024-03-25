@@ -1,4 +1,4 @@
-POST https://8412-102-89-44-26.ngrok-free.app/user/signup
+POST http://localhost:8080/user/signup
 Content-Type: application/json
 
 {
