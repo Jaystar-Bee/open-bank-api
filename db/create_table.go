@@ -1,7 +1,5 @@
 package db
 
-import "fmt"
-
 func CreateTables() {
 
 	userTable := `
@@ -39,7 +37,6 @@ func CreateTables() {
 
 	_, err = MainDB.Exec(walletTable)
 	if err != nil {
-		fmt.Println("wallet table")
 		panic(err)
 	}
 

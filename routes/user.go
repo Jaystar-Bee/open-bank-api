@@ -12,4 +12,5 @@ func UserRoutes(server *gin.Engine) {
 	userRoute.GET("/email/:email", handlers.GetUserByEmail)
 	userRoute.GET("/phone/:phone", handlers.GetUserByPhone)
 	userRoute.GET("/:id", handlers.GetUserById)
+	userRoute.POST("/login", handlers.Login)
 }

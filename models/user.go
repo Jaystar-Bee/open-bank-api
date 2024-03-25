@@ -39,6 +39,7 @@ type USER_RESPONSE struct {
 	IsVerified bool           `json:"is_verified"`
 	CreatedAt  sql.NullString `json:"created_at"`
 	UpdatedAt  sql.NullString `json:"updated_at"`
+	DeletedAt  sql.NullString `json:"deleted_at"`
 }
 
 func (user *USER) Save() error {
@@ -76,38 +77,51 @@ func (user *USER) Save() error {
 	return nil
 }
 
+func (login *USER_LOGIN) Login() error {
+	query := `SELECT password FROM users WHERE email = $1`
+
+	var password string
+	err := db.MainDB.QueryRow(query, login.Email).Scan(&password)
+	if err != nil {
+		return err
+	}
+
+	err = utils.CompareHash(password, login.Password)
+	return err
+}
+
 func GetUserByEmail(email string) (*USER_RESPONSE, error) {
-	query := `SELECT id, first_name, last_name, email, phone, tag, is_verified, created_at, updated_at FROM users WHERE email = $1`
+	query := `SELECT id, first_name, last_name, email, phone, tag, is_verified, created_at, updated_at, deleted_at FROM users WHERE email = $1`
 	data := db.MainDB.QueryRow(query, email)
 
 	user := &USER_RESPONSE{}
-	err := data.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Phone, &user.Tag, &user.IsVerified, &user.CreatedAt, &user.UpdatedAt)
+	err := data.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Phone, &user.Tag, &user.IsVerified, &user.CreatedAt, &user.UpdatedAt, &user.DeletedAt)
 	return user, err
 
 }
 func GetUserByPhone(phone string) (*USER_RESPONSE, error) {
-	query := `SELECT id, first_name, last_name, email, phone, tag, is_verified, created_at, updated_at FROM users WHERE phone = $1`
+	query := `SELECT id, first_name, last_name, email, phone, tag, is_verified, created_at, updated_at, deleted_at FROM users WHERE phone = $1`
 	data := db.MainDB.QueryRow(query, phone)
 
 	user := &USER_RESPONSE{}
-	err := data.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Phone, &user.Tag, &user.IsVerified, &user.CreatedAt, &user.UpdatedAt)
+	err := data.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Phone, &user.Tag, &user.IsVerified, &user.CreatedAt, &user.UpdatedAt, &user.DeletedAt)
 	return user, err
 
 }
 func GetUserByTag(tag string) (*USER_RESPONSE, error) {
-	query := `SELECT id, first_name, last_name, email, phone, tag, is_verified, created_at, updated_at FROM users WHERE tag = $1`
+	query := `SELECT id, first_name, last_name, email, phone, tag, is_verified, created_at, updated_at, deleted_at FROM users WHERE tag = $1`
 	data := db.MainDB.QueryRow(query, tag)
 
 	user := &USER_RESPONSE{}
-	err := data.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Phone, &user.Tag, &user.IsVerified, &user.CreatedAt, &user.UpdatedAt)
+	err := data.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Phone, &user.Tag, &user.IsVerified, &user.CreatedAt, &user.UpdatedAt, &user.DeletedAt)
 	return user, err
 }
 
 func GetUserByID(id int64) (*USER_RESPONSE, error) {
-	query := `SELECT id, first_name, last_name, email, phone, tag, is_verified, created_at, updated_at FROM users WHERE id = $1`
+	query := `SELECT id, first_name, last_name, email, phone, tag, is_verified, created_at, updated_at, deleted_at FROM users WHERE id = $1`
 	data := db.MainDB.QueryRow(query, id)
 
 	user := &USER_RESPONSE{}
-	err := data.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Phone, &user.Tag, &user.IsVerified, &user.CreatedAt, &user.UpdatedAt)
+	err := data.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Phone, &user.Tag, &user.IsVerified, &user.CreatedAt, &user.UpdatedAt, &user.DeletedAt)
 	return user, err
 }
