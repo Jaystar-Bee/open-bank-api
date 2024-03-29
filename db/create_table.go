@@ -28,7 +28,7 @@ func CreateTables() {
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			user_id INTEGER UNIQUE NOT NULL,
 			balance FLOAT NOT NULL,
-			created_at TEXT,
+			created_at TEXT NOT NULL,
 			updated_at TEXT,
 			deleted_at TEXT,
 			FOREIGN KEY (user_id) REFERENCES users(id)
@@ -36,6 +36,31 @@ func CreateTables() {
 	`
 
 	_, err = MainDB.Exec(walletTable)
+	if err != nil {
+		panic(err)
+	}
+
+	transaction_table := `
+		CREATE TABLE IF NOT EXISTS transactions(
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			sender INTEGER NOT NULL,
+			sender_wallet INTEGER NOT NULL,
+			receiver INTEGER NOT NULL,
+			receiver_wallet INTEGER NOT NULL,
+			amount FLOAT NOT NULL,
+			status BOOLEAN NOT NULL,
+			type TEXT NOT NULL,
+			created_at TEXT NOT NULL,
+			updated_at TEXT,
+			deleted_at TEXT,
+			FOREIGN KEY (sender) REFERENCES users(id),
+			FOREIGN KEY (receiver) REFERENCES users(id),
+			FOREIGN KEY (sender_wallet) REFERENCES wallets(id),
+			FOREIGN KEY (receiver_wallet) REFERENCES wallets(id)
+		)
+	`
+
+	_, err = MainDB.Exec(transaction_table)
 	if err != nil {
 		panic(err)
 	}
