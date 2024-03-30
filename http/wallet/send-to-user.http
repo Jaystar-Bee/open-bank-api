@@ -1,0 +1,7 @@
+POST http://localhost:8080/wallet/send
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFeHBpcmVkQXQiOjE3MTE5MDM3NTUsImVtYWlsIjoiamJheWlsYXJhQGdtYWlsLmNvbSIsInVzZXJJZCI6Mn0.khCXwhGOwv4wF5-FLhgTiwRj9wS-Q4X0NmZQUMTvuXk
+
+{
+    "id": 1,
+    "amount": 2000
+}

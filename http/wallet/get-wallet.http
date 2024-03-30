@@ -1,0 +1,2 @@
+GET http://localhost:8080/wallet
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFeHBpcmVkQXQiOjE3MTE4OTkzNDYsImVtYWlsIjoiYW1qYXlzdGFyQGdtYWlsLmNvbSIsInVzZXJJZCI6MX0.hWLMSZGWbADQG3WCVTE0R6UDPyI52auMcUlKwGjIFq0

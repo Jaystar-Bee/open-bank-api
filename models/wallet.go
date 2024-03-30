@@ -1,22 +1,24 @@
 package models
 
 import (
+	"database/sql"
+
 	"github.com/Jaystar-Bee/open-bank-api/db"
 	"github.com/Jaystar-Bee/open-bank-api/utils"
 )
 
 type WALLET struct {
-	ID        int64   `json:"id"`
-	UserID    int64   `json:"user_id"`
-	Balance   float64 `json:"balance"`
-	CreatedAt string  `json:"created_at"`
-	UpdatedAt string  `json:"updated_at"`
-	DeletedAt string  `json:"deleted_at"`
+	ID        int64          `json:"id"`
+	UserID    int64          `json:"user_id"`
+	Balance   float64        `json:"balance"`
+	CreatedAt sql.NullString `json:"created_at"`
+	UpdatedAt sql.NullString `json:"updated_at"`
+	DeletedAt sql.NullString `json:"deleted_at"`
 }
 
 type ADD_TO_BALANCE_BODY struct {
-	ID     int64 `json:"id" binding:"required"`
-	Amount int64 `json:"amount" binding:"required"`
+	ID     int64   `json:"id" binding:"required"`
+	Amount float64 `json:"amount" binding:"required"`
 }
 
 func (user *USER) CreateWallet() error {
@@ -27,14 +29,14 @@ func (user *USER) CreateWallet() error {
 	}
 	defer statement.Close()
 
-	_, err = statement.Exec(user.ID, 0, utils.NowTime())
+	_, err = statement.Exec(user.ID, 120000, utils.NowTime())
 	return err
 }
 
 func (user *USER_RESPONSE) GetWallet() (*WALLET, error) {
 	query := `
-	SELECT * FROM wallets WHERE user_id = ? AND deleted_at IS NULL
-`
+	SELECT * FROM wallets WHERE user_id = ?
+	`
 	wallet := &WALLET{}
 	err := db.MainDB.QueryRow(query, user.ID).Scan(&wallet.ID, &wallet.UserID, &wallet.Balance, &wallet.CreatedAt, &wallet.UpdatedAt, &wallet.DeletedAt)
 	if err != nil {
@@ -46,7 +48,7 @@ func (user *USER_RESPONSE) GetWallet() (*WALLET, error) {
 
 func AddToBalance(amount float64, userId int64) error {
 	query := `
-	UPDATE wallets SET balance = balance + ? WHERE user_id = ?
+	UPDATE wallets SET balance = balance + ?, updated_at = ? WHERE user_id = ?
 	`
 
 	statement, err := db.MainDB.Prepare(query)
@@ -54,19 +56,23 @@ func AddToBalance(amount float64, userId int64) error {
 		return err
 	}
 	defer statement.Close()
-	_, err = statement.Exec(amount, userId)
+	_, err = statement.Exec(amount, utils.NowTime(), userId)
 	return err
 }
 
-func (wallet *WALLET) RemoveFromBalance(amount float64) error {
-	query := `UPDATE wallets SET balance = balance - ? WHERE id = ?`
+func (wallet *WALLET) RemoveFromBalance(amount float64, transaction *TRANSACTION) (*TRANSACTION, error) {
+	query := `UPDATE wallets SET balance = balance - ?, updated_at = ? WHERE id = ?`
 
 	statement, err := db.MainDB.Prepare(query)
 	if err != nil {
-		return err
+		return transaction, err
 	}
 
 	defer statement.Close()
-	_, err = statement.Exec(amount, wallet.ID)
-	return err
+	_, err = statement.Exec(amount, utils.NowTime(), wallet.ID)
+	if err != nil {
+		return transaction, err
+	}
+	transaction, err = transaction.Save()
+	return transaction, err
 }

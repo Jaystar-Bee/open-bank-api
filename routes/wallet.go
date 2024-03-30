@@ -9,6 +9,6 @@ import (
 func WalletRoutes(server *gin.Engine) {
 
 	walletRoutes := server.Group("/wallet").Use(middlewares.CheckAuthentication)
-	walletRoutes.GET("/", handlers.GetWallet)
+	walletRoutes.GET("", handlers.GetWallet)
 	walletRoutes.POST("/send", handlers.SendToUser)
 }

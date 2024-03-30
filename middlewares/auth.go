@@ -30,7 +30,7 @@ func CheckAuthentication(context *gin.Context) {
 		context.AbortWithStatusJSON(http.StatusForbidden, gin.H{"message": "session timeout"})
 		return
 	}
-	user := claimsData["userId"].(float64)
+	user := int64(claimsData["userId"].(float64))
 	email := claimsData["email"].(string)
 
 	context.Set("user", user)

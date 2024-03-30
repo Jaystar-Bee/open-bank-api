@@ -4,9 +4,9 @@ Content-Type: application/json
 {
     "first_name":"John",
     "last_name":"Ayilara",
-    "email":"amjaystar@gmail.com",
+    "email":"jbayilara@gmail.com",
     "password":"Johnpank1",
-    "phone": "090225363843",
-    "transaction_pin":"2340",
-    "tag": "Jaystar"
+    "phone": "09027368492",
+    "transaction_pin":"1000",
+    "tag": "Jay"
 }
