@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/Jaystar-Bee/open-bank-api/models"
@@ -124,10 +124,8 @@ func SendToUser(context *gin.Context) {
 		CreatedAt:       time.Now(),
 	}
 	// Type:            models.Transaction_send,
-	fmt.Println(senderTransaction)
 
 	senderTransaction, err = sender_wallet.RemoveFromBalance(float64(body.Amount), senderTransaction)
-	fmt.Println(senderTransaction)
 	if err != nil {
 		senderTransaction.Status = models.Transaction_failed
 		senderTransaction.Update()
@@ -152,10 +150,191 @@ func SendToUser(context *gin.Context) {
 	}
 	senderTransaction.Status = models.Transaction_completed
 	senderTransaction.Update()
-	fmt.Println(senderTransaction)
 	context.JSON(http.StatusCreated, gin.H{
 		"message": "Transaction successfull",
 		"data":    senderTransaction,
+	})
+
+}
+
+func Deposit(context *gin.Context) {
+	var body struct {
+		Amount float64 `json:"amount"`
+	}
+
+	if err := context.ShouldBindJSON(&body); err != nil {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message":    "Unable to process request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+	if body.Amount <= 0 {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message": "Amount must be greater than 0",
+		})
+		return
+	}
+	user_id := context.GetInt64("user")
+	user, err := models.GetUserByID(user_id)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+			"message":    "User not Found",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+	wallet, err := user.GetWallet()
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+			"message":    "Unable to get user wallet",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+	transaction := &models.TRANSACTION{
+		Sender:          user.ID,
+		Sender_Wallet:   wallet.ID,
+		Amount:          body.Amount,
+		Receiver:        user.ID,
+		Receiver_Wallet: wallet.ID,
+		Status:          models.Transaction_pending,
+		Remarks:         "Deposit",
+		CreatedAt:       time.Now(),
+	}
+	transaction, err = transaction.Save()
+	if err != nil {
+		transaction.Status = models.Transaction_failed
+		transaction.Update()
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message":    "Unable to fulfill transaction",
+			"data":       transaction,
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+	err = models.AddToBalance(body.Amount, user.ID)
+	if err != nil {
+		transaction.Status = models.Transaction_failed
+		transaction.Update()
+		models.AddToBalance(body.Amount, user.ID)
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message":    "Unable to fulfill transaction",
+			"data":       transaction,
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	transaction.Status = models.Transaction_completed
+	transaction.Update()
+	context.JSON(http.StatusCreated, gin.H{
+		"message": "Transaction successfull",
+		"data":    transaction,
+	})
+
+}
+func RequestMoney(context *gin.Context) {
+	var body models.REQUEST
+	err := context.ShouldBindJSON(&body)
+
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message":    "Unable to process request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+	if body.Amount <= 0 {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message": "Amount must be greater than 0",
+		})
+		return
+	}
+	user_id := context.GetInt64("user")
+	user, err := models.GetUserByID(user_id)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+			"message":    "User not Found",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+	_, err = models.GetUserByID(body.Giver)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+			"message":    "Can't find the other user",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+	if user.ID == body.Giver {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message": "You cannot request money from yourself",
+		})
+		return
+	}
+	body.Requester = user.ID
+	body.Status = models.Transaction_pending
+
+	_, err = body.Save()
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message":    "Unable to make a request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+	context.JSON(http.StatusCreated, gin.H{
+		"message": "Request successfull",
+	})
+
+}
+
+func DeleteRequest(context *gin.Context) {
+
+	id, err := strconv.ParseInt(context.Param("id"), 10, 64)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message":    "Unable to process request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+	request, err := models.GetRequestByID(id)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+			"message":    "Request not found",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	if request.Status != models.Transaction_pending {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message": "Request can't be deleted",
+		})
+		return
+	}
+
+	if request.Requester != context.GetInt64("user") {
+		context.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			"message": "You are not authorized to delete this request",
+		})
+		return
+	}
+
+	err = request.Delete()
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message":    "Unable to delete request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{
+		"message": "Request deleted successfully",
 	})
 
 }

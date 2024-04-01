@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/Jaystar-Bee/open-bank-api/db"
@@ -42,12 +41,10 @@ func (transaction *TRANSACTION) Save() (*TRANSACTION, error) {
 		return transaction, err
 	}
 	defer statement.Close()
-	fmt.Println(transaction)
 	data, err := statement.Exec(transaction.Sender, transaction.Sender_Wallet, transaction.Receiver, transaction.Receiver_Wallet, transaction.Amount, transaction.Status, transaction.Type, utils.NowTime(), nil, nil)
 	if err != nil {
 		return transaction, err
 	}
-	fmt.Println(transaction)
 	transaction.ID, err = data.LastInsertId()
 	return transaction, err
 }

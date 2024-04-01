@@ -66,4 +66,24 @@ func CreateTables() {
 		panic(err)
 	}
 
+	request_table := `
+		CREATE TABLE IF NOT EXISTS requests(
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			requester INTEGER NOT NULL,
+			giver INTEGER NOT NULL,
+			amount FLOAT NOT NULL,
+			status TEXT NOT NULL,
+			remarks TEXT,
+			created_at TEXT NOT NULL,
+			updated_at TEXT,
+			deleted_at TEXT,
+			FOREIGN KEY (requester) REFERENCES users(id),
+			FOREIGN KEY (giver) REFERENCES users(id)
+			)
+		`
+	_, err = MainDB.Exec(request_table)
+	if err != nil {
+		panic(err)
+	}
+
 }

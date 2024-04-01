@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -96,7 +95,6 @@ func Login(context *gin.Context) {
 	}
 
 	// GENERATE TOKEN
-	fmt.Println(user.ID)
 	token, err := jwt.GenerateJWT(user.ID, user.Email, time.Now().Add(time.Hour*24).Unix())
 	if err != nil {
 		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
