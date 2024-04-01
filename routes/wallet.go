@@ -12,6 +12,7 @@ func WalletRoutes(server *gin.Engine) {
 	walletRoutes.GET("", handlers.GetWallet)
 	walletRoutes.POST("/send", handlers.SendToUser)
 	walletRoutes.POST("/requests", handlers.RequestMoney)
+	walletRoutes.GET("/requests", nil)
 	walletRoutes.DELETE("/requests/:id", handlers.DeleteRequest)
 	walletRoutes.POST("/requests/confirm", nil)
 	walletRoutes.POST("/requests/reject", nil)
