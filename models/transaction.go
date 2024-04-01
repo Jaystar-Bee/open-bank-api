@@ -27,6 +27,7 @@ type TRANSACTION struct {
 	Receiver_Wallet int64     `json:"receiver_wallet" binding:"required"`
 	Amount          float64   `json:"amount" binding:"required"`
 	Status          string    `json:"status" binding:"required"`
+	Remarks         string    `json:"remarks"`
 	Type            string    `json:"type"`
 	CreatedAt       time.Time `json:"created_at"`
 	UpdatedAt       time.Time `json:"updated_at"`

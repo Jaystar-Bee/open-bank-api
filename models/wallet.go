@@ -17,8 +17,10 @@ type WALLET struct {
 }
 
 type ADD_TO_BALANCE_BODY struct {
-	ID     int64   `json:"id" binding:"required"`
-	Amount float64 `json:"amount" binding:"required"`
+	ID             int64   `json:"id" binding:"required"`
+	Amount         float64 `json:"amount" binding:"required"`
+	Remarks        string  `json:"remarks"`
+	TransactionPin string  `json:"transaction_pin" binding:"required"`
 }
 
 func (user *USER) CreateWallet() error {

@@ -125,3 +125,17 @@ func GetUserByID(id int64) (*USER_RESPONSE, error) {
 	err := data.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.Phone, &user.Tag, &user.IsVerified, &user.CreatedAt, &user.UpdatedAt, &user.DeletedAt)
 	return user, err
 }
+
+func (user *USER_RESPONSE) ConfirmPin(pin string) error {
+	query := `SELECT transaction_pin FROM users WHERE id = $1`
+	var dbPin string
+	err := db.MainDB.QueryRow(query, user.ID).Scan(&dbPin)
+	if err != nil {
+		return err
+	}
+	err = utils.CompareHash(dbPin, pin)
+	if err != nil {
+		return err
+	}
+	return nil
+}

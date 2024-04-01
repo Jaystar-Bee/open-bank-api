@@ -104,6 +104,15 @@ func SendToUser(context *gin.Context) {
 		})
 	}
 
+	err = sender.ConfirmPin(body.TransactionPin)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message":    "Invalid transaction pin",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
 	senderTransaction := &models.TRANSACTION{
 		Sender:          sender.ID,
 		Sender_Wallet:   sender_wallet.ID,
@@ -111,6 +120,7 @@ func SendToUser(context *gin.Context) {
 		Receiver_Wallet: receiver_wallet.ID,
 		Amount:          body.Amount,
 		Status:          models.Transaction_pending,
+		Remarks:         body.Remarks,
 		CreatedAt:       time.Now(),
 	}
 	// Type:            models.Transaction_send,

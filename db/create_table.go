@@ -50,6 +50,7 @@ func CreateTables() {
 			amount FLOAT NOT NULL,
 			status TEXT NOT NULL,
 			type TEXT,
+			remarks TEXT,
 			created_at TEXT NOT NULL,
 			updated_at TEXT,
 			deleted_at TEXT,
