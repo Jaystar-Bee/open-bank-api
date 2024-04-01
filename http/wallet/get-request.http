@@ -1,2 +1,0 @@
-DELETE http://localhost:8080/wallet/requests
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFeHBpcmVkQXQiOjE3MTIwNDM0MDgsImVtYWlsIjoiamJheWlsYXJhQGdtYWlsLmNvbSIsInVzZXJJZCI6MX0.ZxD011HxWDW8r9nLi5FDVph5dchb67y16NRmGUB5N2E
