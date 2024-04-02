@@ -1,2 +1,0 @@
-POST http://localhost:8080/wallet/requests/5/confirm
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJFeHBpcmVkQXQiOjE3MTIxNzM0NzUsImVtYWlsIjoiYW1qYXlzdGFyQGdtYWlsLmNvbSIsInVzZXJJZCI6Mn0.yK9xndz8B5IHpp1woHtov5AKJ6NE9t-Pd-2EKWu438M
