@@ -15,6 +15,7 @@ const (
 const (
 	Transaction_pending   = "PENDING"
 	Transaction_failed    = "FAILED"
+	Transaction_rejected  = "REJECTED"
 	Transaction_completed = "COMPLETED"
 )
 

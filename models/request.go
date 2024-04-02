@@ -7,6 +7,11 @@ import (
 	"github.com/Jaystar-Bee/open-bank-api/utils"
 )
 
+const (
+	Request_Giver     = "GIVER"
+	Request_Requester = "REQUESTER"
+)
+
 type REQUEST struct {
 	ID        int64          `json:"id"`
 	Requester int64          `json:"requester"`
@@ -69,4 +74,46 @@ func GetRequestByID(requestId int64) (*REQUEST, error) {
 	err := row.Scan(&request.ID, &request.Requester, &request.Giver, &request.Amount, &request.Status, &request.Remarks, &request.CreatedAt, &request.UpdatedAt, &request.DeletedAt)
 
 	return request, err
+}
+
+func GetUserResquests(userId int64) ([]*REQUEST, error) {
+	query := `SELECT * FROM requests WHERE requester = $1`
+	rows, err := db.MainDB.Query(query, userId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var requests []*REQUEST
+	for rows.Next() {
+		request := &REQUEST{}
+		err := rows.Scan(&request.ID, &request.Requester, &request.Giver, &request.Amount, &request.Status, &request.Remarks, &request.CreatedAt, &request.UpdatedAt, &request.DeletedAt)
+		if err != nil {
+			return nil, err
+		}
+		requests = append(requests, request)
+	}
+
+	return requests, nil
+}
+
+func GetRequestsToPay(userId int64) ([]*REQUEST, error) {
+	query := `SELECT * FROM requests WHERE giver = $1`
+	rows, err := db.MainDB.Query(query, userId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var requests []*REQUEST
+	for rows.Next() {
+		request := &REQUEST{}
+		err := rows.Scan(&request.ID, &request.Requester, &request.Giver, &request.Amount, &request.Status, &request.Remarks, &request.CreatedAt, &request.UpdatedAt, &request.DeletedAt)
+		if err != nil {
+			return nil, err
+		}
+		requests = append(requests, request)
+	}
+
+	return requests, nil
 }

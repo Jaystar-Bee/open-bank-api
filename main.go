@@ -19,5 +19,6 @@ func main() {
 	server := gin.Default()
 	routes.UserRoutes(server)
 	routes.WalletRoutes(server)
+	routes.TransactionRoutes(server)
 	server.Run()
 }

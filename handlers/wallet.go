@@ -338,3 +338,293 @@ func DeleteRequest(context *gin.Context) {
 	})
 
 }
+
+func GetUserRequests(context *gin.Context) {
+	user_id := context.GetInt64("user")
+
+	requestType := context.Query("type") // GIVER OR REQUESTER
+
+	_, err := models.GetUserByID(user_id)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+			"message":    "User not Found",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	var requests []*models.REQUEST
+	if requestType == models.Request_Giver {
+		requests, err = models.GetRequestsToPay(user_id)
+		if err != nil {
+			context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"message":    "Unable to get requests",
+				"dev_reason": err.Error(),
+			})
+			return
+		}
+	} else {
+		requests, err = models.GetUserResquests(user_id)
+		if err != nil {
+			context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"message":    "Unable to get requests",
+				"dev_reason": err.Error(),
+			})
+			return
+		}
+	}
+	context.JSON(http.StatusOK, gin.H{
+		"message": "Requests retrieved successfully",
+		"data":    requests,
+		"count":   len(requests),
+	})
+
+}
+
+func RejectRequest(context *gin.Context) {
+
+	// PARSE PARAMS
+	id, err := strconv.ParseInt(context.Param("id"), 10, 64)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message":    "Unable to process request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+	request, err := models.GetRequestByID(id)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+			"message":    "Request not found",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	// CHECKS
+	if request.Status != models.Transaction_pending {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message": "Request can't be rejected",
+		})
+		return
+	}
+
+	if request.Giver != context.GetInt64("user") {
+		context.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			"message": "You are not authorized to reject this request",
+		})
+		return
+	}
+
+	// GET GIVER AND REQUESTER WALLETS
+	giver, err := models.GetUserByID(request.Giver)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message":    "Error rejecting request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+	giver_wallet, err := giver.GetWallet()
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message":    "Error rejecting request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+	requester, err := models.GetUserByID(request.Requester)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message":    "Error rejecting request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+	requester_wallet, err := requester.GetWallet()
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message":    "Error rejecting request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	// INITIATE TRANSACTION
+	transaction := &models.TRANSACTION{
+		Sender:          request.Giver,
+		Sender_Wallet:   giver_wallet.ID,
+		Amount:          request.Amount,
+		Receiver:        request.Requester,
+		Receiver_Wallet: requester_wallet.ID,
+		Status:          models.Transaction_pending,
+		Remarks:         request.Remarks,
+		CreatedAt:       time.Now(),
+	}
+	transaction, err = transaction.Save()
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message":    "Error rejecting request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	// SET REQUEST STATUS
+	request.Status = models.Transaction_rejected
+	request, err = request.Update()
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message":    "Error rejecting request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+	transaction.Status = models.Transaction_rejected
+	transaction.Update()
+
+	context.JSON(http.StatusOK, gin.H{
+		"message": "Request rejected successfully",
+		"data":    request,
+	})
+
+}
+
+func ConfirmRequest(context *gin.Context) {
+
+	// PARSE PARAMS
+	id, err := strconv.ParseInt(context.Param("id"), 10, 64)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message":    "Unable to process request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+	request, err := models.GetRequestByID(id)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+			"message":    "Request not found",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	// CHECKS
+	if request.Status != models.Transaction_pending {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message": "Request can't be confirmed",
+		})
+		return
+	}
+
+	if request.Giver != context.GetInt64("user") {
+		context.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			"message": "You are not authorized to confirm this request",
+		})
+		return
+	}
+
+	// GET GIVER AND REQUESTER WALLETS
+	giver, err := models.GetUserByID(request.Giver)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message":    "Error confirming request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+	giver_wallet, err := giver.GetWallet()
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message":    "Error confirming request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	if request.Amount > giver_wallet.Balance {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message": "Insufficient balance",
+		})
+		return
+	}
+
+	requester, err := models.GetUserByID(request.Requester)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message":    "Error confirming request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+	requester_wallet, err := requester.GetWallet()
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message":    "Error confirming request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	// INITIATE TRANSACTION
+	transaction := &models.TRANSACTION{
+		Sender:          request.Giver,
+		Sender_Wallet:   giver_wallet.ID,
+		Amount:          request.Amount,
+		Receiver:        request.Requester,
+		Receiver_Wallet: requester_wallet.ID,
+		Status:          models.Transaction_pending,
+		Remarks:         request.Remarks,
+		CreatedAt:       time.Now(),
+	}
+
+	// REMOVE FROM GIVER BALANCE AND SAVE TRANSACTION AS PENDING
+	transaction, err = giver_wallet.RemoveFromBalance(request.Amount, transaction)
+	if err != nil {
+		transaction.Status = models.Transaction_failed
+		transaction.Update()
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message":    "Error confirming request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	// ADD TO REQUESTER BALANCE
+	err = models.AddToBalance(request.Amount, requester_wallet.ID)
+	if err != nil {
+		transaction.Status = models.Transaction_failed
+		transaction.Update()
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message":    "Error confirming request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	// UPDATE REQUEST TO SUCCESS
+	request.Status = models.Transaction_completed
+	request, err = request.Update()
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message":    "Error confirming request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+	transaction.Status = models.Transaction_completed
+	_, err = transaction.Update()
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message":    "Error confirming request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+	context.JSON(http.StatusOK, gin.H{
+		"message": "Request confirmed successfully",
+		"data":    request,
+	})
+
+}
