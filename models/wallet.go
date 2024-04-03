@@ -62,7 +62,7 @@ func AddToBalance(amount float64, userId int64) error {
 	return err
 }
 
-func (wallet *WALLET) RemoveFromBalance(amount float64, transaction *TRANSACTION) (*TRANSACTION, error) {
+func (wallet *WALLET) RemoveFromBalance(amount float64, transaction *TRANSACTION[int64]) (*TRANSACTION[int64], error) {
 	query := `UPDATE wallets SET balance = balance - ?, updated_at = ? WHERE id = ?`
 
 	statement, err := db.MainDB.Prepare(query)

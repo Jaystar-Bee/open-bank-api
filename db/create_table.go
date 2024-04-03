@@ -49,7 +49,6 @@ func CreateTables() {
 			receiver_wallet INTEGER NOT NULL,
 			amount FLOAT NOT NULL,
 			status TEXT NOT NULL,
-			type TEXT,
 			remarks TEXT,
 			created_at TEXT NOT NULL,
 			updated_at TEXT,

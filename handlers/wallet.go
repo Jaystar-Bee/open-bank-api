@@ -113,7 +113,7 @@ func SendToUser(context *gin.Context) {
 		return
 	}
 
-	senderTransaction := &models.TRANSACTION{
+	senderTransaction := &models.TRANSACTION[int64]{
 		Sender:          sender.ID,
 		Sender_Wallet:   sender_wallet.ID,
 		Receiver:        receiver.ID,
@@ -192,7 +192,7 @@ func Deposit(context *gin.Context) {
 		})
 		return
 	}
-	transaction := &models.TRANSACTION{
+	transaction := &models.TRANSACTION[int64]{
 		Sender:          user.ID,
 		Sender_Wallet:   wallet.ID,
 		Amount:          body.Amount,
@@ -451,7 +451,7 @@ func RejectRequest(context *gin.Context) {
 	}
 
 	// INITIATE TRANSACTION
-	transaction := &models.TRANSACTION{
+	transaction := &models.TRANSACTION[int64]{
 		Sender:          request.Giver,
 		Sender_Wallet:   giver_wallet.ID,
 		Amount:          request.Amount,
@@ -568,7 +568,7 @@ func ConfirmRequest(context *gin.Context) {
 	}
 
 	// INITIATE TRANSACTION
-	transaction := &models.TRANSACTION{
+	transaction := &models.TRANSACTION[int64]{
 		Sender:          request.Giver,
 		Sender_Wallet:   giver_wallet.ID,
 		Amount:          request.Amount,
