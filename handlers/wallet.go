@@ -9,6 +9,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetWallet godoc
+//
+//	@Summary		Get Wallet
+//	@Description	Get Wallet
+//	@Tags			Wallet
+//	@Accept			json
+//	@Produce		json
+//	@Security		ApiKeyAuth
+//	@Success		200	{object}	models.HTTP_WALLET_RESPONSE	"wallet fetched successfully"
+//	@Failure		401	{object}	models.Error
+//	@Failure		404	{object}	models.Error
+//	@Router			/wallet [get]
 func GetWallet(context *gin.Context) {
 
 	user_id := context.GetInt64("user")
@@ -37,6 +49,21 @@ func GetWallet(context *gin.Context) {
 
 }
 
+// TopUpWallet godoc
+//
+//	@Summary		Send money
+//	@Description	Send money to another user
+//	@Tags			Wallet
+//	@Accept			json
+//	@Produce		json
+//	@Security		ApiKeyAuth
+//	@Param			body	body		models.ADD_TO_BALANCE_BODY	true	"body"
+//	@Success		200		{object}	models.HTTP_TRANSACTION_BY_ID_RESPONSE	"wallet updated successfully"
+//	@Failure		400		{object}	models.Error
+//	@Failure		401		{object}	models.Error
+//	@Failure		404		{object}	models.Error
+//	@Failure		500		{object}	models.Error
+//	@Router			/wallet/send [post]
 func SendToUser(context *gin.Context) {
 
 	var body models.ADD_TO_BALANCE_BODY

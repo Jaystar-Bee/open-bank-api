@@ -2,10 +2,20 @@ package models
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/Jaystar-Bee/open-bank-api/db"
 	"github.com/Jaystar-Bee/open-bank-api/utils"
 )
+
+type WALLET_REQUEST struct {
+	ID        int64     `json:"id"`
+	Balance   float64   `json:"balance"`
+	UserID    int64     `json:"user_id"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	DeletedAt time.Time `json:"deleted_at"`
+}
 
 type WALLET struct {
 	ID        int64          `json:"id"`

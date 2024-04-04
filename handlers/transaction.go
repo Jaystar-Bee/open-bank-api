@@ -9,8 +9,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetTags 		godoc
+//
+//	@Summary		Get user transaction list
+//	@Description	You can get user transaction list and the list are paginated, which is 10 transactions per page by default.
+//	@Tags			Transactions
+//	@Accept			json
+//	@Produce		json
+//	@Security		ApiKeyAuth
+//	@Success		200	{object}	models.HTTP_TRANSACTION_LIST_RESPONSE	"Ok"
+//	@Failure		400	{object}	models.Error							"Check queries"
+//	@Failure		404	{object}	models.Error							"User not found"
+//	@Failure		500	{object}	models.Error							"Unable to fetch transactions"
+//	@Router			/transactions [get]
 func GetTransactions(context *gin.Context) {
-
 	user_id := context.GetInt64("user")
 
 	user, err := models.GetUserByID(user_id)
@@ -82,6 +94,70 @@ func GetTransactions(context *gin.Context) {
 			"has_next":      page_number < math.Ceil(total_counts/per_page),
 			"has_previous":  page_number > 1,
 		},
+	})
+
+}
+
+// GetTransactionByID 	godoc
+//
+//	@Tags			Transactions
+//	@Summary		Get transaction by ID
+//	@Description	You can get transaction by ID.
+//	@Accept			json
+//	@Produce		json
+//	@Security		ApiKeyAuth
+//	@Param			id	path		int										true	"Transaction ID"
+//	@Success		200	{object}	models.HTTP_TRANSACTION_BY_ID_RESPONSE	"Ok"
+//	@Failure		400	{object}	models.Error							"Check queries"
+//	@Failure		404	{object}	models.Error							"User not found"
+//	@Failure		404	{object}	models.Error							"Transaction not found"
+//	@Failure		500	{object}	models.Error							"Unable to fetch transaction"
+//	@Router			/transactions/{id} [get]
+func GetTransactionByID(context *gin.Context) {
+	user_id := context.GetInt64("user")
+
+	_, err := models.GetUserByID(user_id)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+			"message":    "User not found",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	transaction_id, err := strconv.ParseInt(context.Param("id"), 10, 64)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message":    "Unable to process request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	transaction, err := models.GetTransactionByID(transaction_id)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+			"message":    "Unable to fetch transaction",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+	if transaction.Receiver.ID != user_id && transaction.Sender.ID != user_id {
+		context.AbortWithStatusJSON(http.StatusForbidden, gin.H{
+			"message": "You're not authorized to this transaction",
+		})
+		return
+	}
+
+	if transaction.Receiver.ID == user_id {
+		transaction.Type = models.Transaction_receive
+	} else {
+		transaction.Type = models.Transaction_send
+	}
+
+	context.JSON(http.StatusOK, gin.H{
+		"message": "Transaction fetched successfully",
+		"data":    transaction,
 	})
 
 }

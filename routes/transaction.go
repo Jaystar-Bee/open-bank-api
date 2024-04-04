@@ -8,4 +8,5 @@ import (
 
 func TransactionRoutes(server *gin.Engine) {
 	server.GET("/transactions", middlewares.CheckAuthentication, handlers.GetTransactions)
+	server.GET("/transactions/:id", middlewares.CheckAuthentication, handlers.GetTransactionByID)
 }

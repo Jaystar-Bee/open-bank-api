@@ -23,7 +23,7 @@ const (
 type UserTypes interface {
 }
 
-type TRANSACTION[T int64 | *USER_RESPONSE] struct {
+type TRANSACTION[T int64 | *USER_RESPONSE | *USER] struct {
 	ID              int64     `json:"id"`
 	Sender          T         `json:"sender" binding:"required"`
 	Sender_Wallet   int64     `json:"sender_wallet" binding:"required"`
@@ -118,4 +118,19 @@ func (user *USER_RESPONSE) GetTransactions(per_page, page_number float64) ([]TRA
 		transactions = append(transactions, transaction)
 	}
 	return transactions, count, nil
+}
+
+func GetTransactionByID(id int64) (*TRANSACTION_RESPONSE[*USER_RESPONSE], error) {
+	query := `SELECT * FROM transactions WHERE id = $1`
+
+	var transaction TRANSACTION_RESPONSE[*USER_RESPONSE]
+	var sender int64
+	var receiver int64
+	err := db.MainDB.QueryRow(query, id).Scan(&transaction.ID, &sender, &transaction.Sender_Wallet, &receiver, &transaction.Receiver_Wallet, &transaction.Amount, &transaction.Status, &transaction.Remarks, &transaction.CreatedAt, &transaction.UpdatedAt, &transaction.DeletedAt)
+	if err != nil {
+		return nil, err
+	}
+	transaction.Sender, _ = GetUserByID(sender)
+	transaction.Receiver, _ = GetUserByID(receiver)
+	return &transaction, nil
 }

@@ -11,6 +11,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// CreateTags 		godoc
+//
+//	@Tags			User
+//	@Description	Onboard user to the application.
+//	@Summary		Create a user
+//	@Accept			json
+//	@Produce		json
+//	@Param			user	body		models.USER_REQUEST					true	"Create User"
+//	@Success		201		{object}	models.HTTP_MESSAGE_ONLY_RESPONSE	"User created successfully"
+//	@Failure		400		{object}	models.Error						"Check body"
+//	@Failure		404		{object}	models.Error						"User not found"
+//	@Failure		500		{object}	models.Error						"Internal server error"
+//	@Router			/user/signup [post]
 func CreateUser(context *gin.Context) {
 	var user models.USER
 
@@ -72,6 +85,19 @@ func CreateUser(context *gin.Context) {
 	})
 }
 
+// LogUserIn		godoc
+//
+//	@Tags			User
+//	@Description	Log user in to the application.
+//	@Summary		Log user in
+//	@Accept			json
+//	@Produce		json
+//	@Param			login	body		models.USER_LOGIN			true	"Log User In"
+//	@Success		200		{object}	models.HTTP_LOGIN_RESPONSE	"User logged in successfully"
+//	@Failure		400		{object}	models.Error
+//	@Failure		404		{object}	models.Error
+//	@Failure		500		{object}	models.Error
+//	@Router			/user/login [post]
 func Login(context *gin.Context) {
 	var login models.USER_LOGIN
 	err := context.ShouldBindJSON(&login)
@@ -121,6 +147,19 @@ func Login(context *gin.Context) {
 
 }
 
+// RenewToken		godoc
+//
+//	@Tags			User
+//	@Description	Renew user token.
+//	@Summary		Renew token
+//	@Accept			json
+//	@Produce		json
+//	@Security		ApiKeyAuth
+//	@Success		200	{object}	models.HTTP_TOKEN_RESPONSE	"Token renewd successfully"
+//	@Failure		400	{object}	models.Error
+//	@Failure		404	{object}	models.Error
+//	@Failure		500	{object}	models.Error
+//	@Router			/user/renew [get]
 func RenewToken(context *gin.Context) {
 	email := context.GetString("email")
 
@@ -148,6 +187,19 @@ func RenewToken(context *gin.Context) {
 
 }
 
+// GetUserByTag	godoc
+//
+//	@Tags			User
+//	@Description	Get user by tag.
+//	@Summary		Get user by tag.
+//	@Accept			json
+//	@Produce		json
+//	@Param			tag	path		string						true	"User Tag"
+//	@Success		200	{object}	models.HTTP_USER_RESPONSE	"User fetched successfully"
+//	@Failure		400	{object}	models.Error
+//	@Failure		404	{object}	models.Error
+//	@Failure		500	{object}	models.Error
+//	@Router			/user/{tag} [get]
 func GetUserByTag(context *gin.Context) {
 	tag := context.Param("tag")
 
@@ -172,6 +224,19 @@ func GetUserByTag(context *gin.Context) {
 	})
 }
 
+// GetUserByEmail	godoc
+//
+//	@Tags			User
+//	@Description	Get user by email.
+//	@Summary		Get user by email.
+//	@Accept			json
+//	@Produce		json
+//	@Param			tag	path		string						true	"User Email"
+//	@Success		200	{object}	models.HTTP_USER_RESPONSE	"User fetched successfully"
+//	@Failure		400	{object}	models.Error
+//	@Failure		404	{object}	models.Error
+//	@Failure		500	{object}	models.Error
+//	@Router			/user/{email} [get]
 func GetUserByEmail(context *gin.Context) {
 	email := context.Param("email")
 
@@ -196,6 +261,19 @@ func GetUserByEmail(context *gin.Context) {
 	})
 }
 
+// GetUserByPhone	godoc
+//
+//	@Tags			User
+//	@Description	Get user by phone.
+//	@Summary		Get user by phone.
+//	@Accept			json
+//	@Produce		json
+//	@Param			tag	path		string						true	"User Phone"
+//	@Success		200	{object}	models.HTTP_USER_RESPONSE	"User fetched successfully"
+//	@Failure		400	{object}	models.Error
+//	@Failure		404	{object}	models.Error
+//	@Failure		500	{object}	models.Error
+//	@Router			/user/{phone} [get]
 func GetUserByPhone(context *gin.Context) {
 	phone := context.Param("phone")
 
@@ -219,6 +297,20 @@ func GetUserByPhone(context *gin.Context) {
 		"data":    user,
 	})
 }
+
+// GetUserById	godoc
+//
+//	@Tags			User
+//	@Description	Get user by Id.
+//	@Summary		Get user by Id.
+//	@Accept			json
+//	@Produce		json
+//	@Param			tag	path		string						true	"User Id"
+//	@Success		200	{object}	models.HTTP_USER_RESPONSE	"User fetched successfully"
+//	@Failure		400	{object}	models.Error
+//	@Failure		404	{object}	models.Error
+//	@Failure		500	{object}	models.Error
+//	@Router			/user/{user_id} [get]
 func GetUserById(context *gin.Context) {
 	id := context.Param("id")
 	parsedId, err := strconv.ParseInt(id, 10, 64)

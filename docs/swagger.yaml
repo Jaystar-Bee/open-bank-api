@@ -1,0 +1,588 @@
+definitions:
+  models.ADD_TO_BALANCE_BODY:
+    properties:
+      amount:
+        type: number
+      id:
+        type: integer
+      remarks:
+        type: string
+      transaction_pin:
+        type: string
+    required:
+    - amount
+    - id
+    - transaction_pin
+    type: object
+  models.Error:
+    properties:
+      dev_reason:
+        type: string
+      message:
+        type: string
+    type: object
+  models.HTTP_LOGIN_RESPONSE:
+    properties:
+      data:
+        $ref: '#/definitions/models.USER'
+      message:
+        type: string
+      token:
+        type: string
+    type: object
+  models.HTTP_MESSAGE_ONLY_RESPONSE:
+    properties:
+      message:
+        type: string
+    type: object
+  models.HTTP_TOKEN_RESPONSE:
+    properties:
+      message:
+        type: string
+      token:
+        type: string
+    type: object
+  models.HTTP_TRANSACTION_BY_ID_RESPONSE:
+    properties:
+      data:
+        $ref: '#/definitions/models.TRANSACTION-models_USER'
+      message:
+        type: string
+    type: object
+  models.HTTP_TRANSACTION_DATA_RESPONSE:
+    properties:
+      current_page:
+        type: number
+      first_page:
+        type: number
+      has_next:
+        type: boolean
+      has_previous:
+        type: boolean
+      last_page:
+        type: number
+      next_page:
+        type: number
+      page_number:
+        type: number
+      per_page:
+        type: number
+      previous_page:
+        type: number
+      total_counts:
+        type: number
+      total_pages:
+        type: number
+      transactions:
+        $ref: '#/definitions/models.TRANSACTION-models_USER'
+    type: object
+  models.HTTP_TRANSACTION_LIST_RESPONSE:
+    properties:
+      data:
+        $ref: '#/definitions/models.HTTP_TRANSACTION_DATA_RESPONSE'
+      message:
+        type: string
+    type: object
+  models.HTTP_USER_RESPONSE:
+    properties:
+      data:
+        $ref: '#/definitions/models.USER'
+      message:
+        type: string
+    type: object
+  models.HTTP_WALLET_RESPONSE:
+    properties:
+      data:
+        $ref: '#/definitions/models.WALLET_REQUEST'
+      message:
+        type: string
+    type: object
+  models.TRANSACTION-models_USER:
+    properties:
+      amount:
+        type: number
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      receiver:
+        $ref: '#/definitions/models.USER'
+      receiver_wallet:
+        type: integer
+      remarks:
+        type: string
+      sender:
+        $ref: '#/definitions/models.USER'
+      sender_wallet:
+        type: integer
+      status:
+        type: string
+      updated_at:
+        type: string
+    required:
+    - amount
+    - receiver
+    - receiver_wallet
+    - sender
+    - sender_wallet
+    - status
+    type: object
+  models.USER:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: integer
+      is_verified:
+        type: boolean
+      last_name:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      tag:
+        type: string
+      transaction_pin:
+        type: string
+      updated_at:
+        type: string
+    required:
+    - email
+    - first_name
+    - last_name
+    - password
+    - tag
+    - transaction_pin
+    type: object
+  models.USER_LOGIN:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  models.USER_REQUEST:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      tag:
+        type: string
+      transaction_pin:
+        type: string
+    required:
+    - email
+    - first_name
+    - last_name
+    - password
+    - tag
+    - transaction_pin
+    type: object
+  models.WALLET_REQUEST:
+    properties:
+      balance:
+        type: number
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+    type: object
+info:
+  contact:
+    email: jbayilara@gmail.com
+    name: John Ayilara (Jaystar)
+    url: https://github.com/Jaystar-Bee
+  description: OPEN BANK API
+  title: OPEN BANK API
+  version: "1.0"
+paths:
+  /transactions:
+    get:
+      consumes:
+      - application/json
+      description: You can get user transaction list and the list are paginated, which
+        is 10 transactions per page by default.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ok
+          schema:
+            $ref: '#/definitions/models.HTTP_TRANSACTION_LIST_RESPONSE'
+        "400":
+          description: Check queries
+          schema:
+            $ref: '#/definitions/models.Error'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Unable to fetch transactions
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Get user transaction list
+      tags:
+      - Transactions
+  /transactions/{id}:
+    get:
+      consumes:
+      - application/json
+      description: You can get transaction by ID.
+      parameters:
+      - description: Transaction ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ok
+          schema:
+            $ref: '#/definitions/models.HTTP_TRANSACTION_BY_ID_RESPONSE'
+        "400":
+          description: Check queries
+          schema:
+            $ref: '#/definitions/models.Error'
+        "404":
+          description: Transaction not found
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Unable to fetch transaction
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Get transaction by ID
+      tags:
+      - Transactions
+  /user/{email}:
+    get:
+      consumes:
+      - application/json
+      description: Get user by email.
+      parameters:
+      - description: User Email
+        in: path
+        name: tag
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User fetched successfully
+          schema:
+            $ref: '#/definitions/models.HTTP_USER_RESPONSE'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get user by email.
+      tags:
+      - User
+  /user/{phone}:
+    get:
+      consumes:
+      - application/json
+      description: Get user by phone.
+      parameters:
+      - description: User Phone
+        in: path
+        name: tag
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User fetched successfully
+          schema:
+            $ref: '#/definitions/models.HTTP_USER_RESPONSE'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get user by phone.
+      tags:
+      - User
+  /user/{tag}:
+    get:
+      consumes:
+      - application/json
+      description: Get user by tag.
+      parameters:
+      - description: User Tag
+        in: path
+        name: tag
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User fetched successfully
+          schema:
+            $ref: '#/definitions/models.HTTP_USER_RESPONSE'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get user by tag.
+      tags:
+      - User
+  /user/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get user by Id.
+      parameters:
+      - description: User Id
+        in: path
+        name: tag
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User fetched successfully
+          schema:
+            $ref: '#/definitions/models.HTTP_USER_RESPONSE'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get user by Id.
+      tags:
+      - User
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: Log user in to the application.
+      parameters:
+      - description: Log User In
+        in: body
+        name: login
+        required: true
+        schema:
+          $ref: '#/definitions/models.USER_LOGIN'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User logged in successfully
+          schema:
+            $ref: '#/definitions/models.HTTP_LOGIN_RESPONSE'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Log user in
+      tags:
+      - User
+  /user/renew:
+    get:
+      consumes:
+      - application/json
+      description: Renew user token.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Token renewd successfully
+          schema:
+            $ref: '#/definitions/models.HTTP_TOKEN_RESPONSE'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Renew token
+      tags:
+      - User
+  /user/signup:
+    post:
+      consumes:
+      - application/json
+      description: Onboard user to the application.
+      parameters:
+      - description: Create User
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.USER_REQUEST'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User created successfully
+          schema:
+            $ref: '#/definitions/models.HTTP_MESSAGE_ONLY_RESPONSE'
+        "400":
+          description: Check body
+          schema:
+            $ref: '#/definitions/models.Error'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Create a user
+      tags:
+      - User
+  /wallet:
+    get:
+      consumes:
+      - application/json
+      description: Get Wallet
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: wallet fetched successfully
+          schema:
+            $ref: '#/definitions/models.HTTP_WALLET_RESPONSE'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Wallet
+      tags:
+      - Wallet
+  /wallet/send:
+    post:
+      consumes:
+      - application/json
+      description: Send money to another user
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.ADD_TO_BALANCE_BODY'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: wallet updated successfully
+          schema:
+            $ref: '#/definitions/models.HTTP_TRANSACTION_BY_ID_RESPONSE'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Send money
+      tags:
+      - Wallet
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
