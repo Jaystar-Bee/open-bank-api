@@ -57,7 +57,7 @@ func GetWallet(context *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Security		ApiKeyAuth
-//	@Param			body	body		models.ADD_TO_BALANCE_BODY	true	"body"
+//	@Param			body	body		models.ADD_TO_BALANCE_BODY				true	"body"
 //	@Success		200		{object}	models.HTTP_TRANSACTION_BY_ID_RESPONSE	"wallet updated successfully"
 //	@Failure		400		{object}	models.Error
 //	@Failure		401		{object}	models.Error
@@ -184,6 +184,21 @@ func SendToUser(context *gin.Context) {
 
 }
 
+// Deposit godoc
+//
+//	@Summary		Deposit money
+//	@Description	Deposit money to your wallet
+//	@Tags			Wallet
+//	@Accept			json
+//	@Produce		json
+//	@Security		ApiKeyAuth
+//	@Param			body	body		models.DEPOSIT_BODY						true	"body"
+//	@Success		200		{object}	models.HTTP_TRANSACTION_BY_ID_RESPONSE	"wallet updated successfully"
+//	@Failure		400		{object}	models.Error
+//	@Failure		401		{object}	models.Error
+//	@Failure		404		{object}	models.Error
+//	@Failure		500		{object}	models.Error
+//	@Router			/wallet/deposit [post]
 func Deposit(context *gin.Context) {
 	var body struct {
 		Amount float64 `json:"amount"`
@@ -261,6 +276,22 @@ func Deposit(context *gin.Context) {
 	})
 
 }
+
+// RequestMoney	godoc
+//
+//	@Summary		Request money
+//	@Description	Request money from another user
+//	@Tags			Wallet
+//	@Accept			json
+//	@Produce		json
+//	@Security		ApiKeyAuth
+//	@Param			body	body		models.HTTP_REQUEST					true	"body"
+//	@Success		200		{object}	models.HTTP_MESSAGE_ONLY_RESPONSE	"Request successfully"
+//	@Failure		400		{object}	models.Error
+//	@Failure		401		{object}	models.Error
+//	@Failure		404		{object}	models.Error
+//	@Failure		500		{object}	models.Error
+//	@Router			/wallet/requests [post]
 func RequestMoney(context *gin.Context) {
 	var body models.REQUEST
 	err := context.ShouldBindJSON(&body)
@@ -318,6 +349,21 @@ func RequestMoney(context *gin.Context) {
 
 }
 
+// DeleteRequest godoc
+//
+//	@Summary		Delete a request
+//	@Description	Delete a request
+//	@Tags			Wallet
+//	@Accept			json
+//	@Produce		json
+//	@Security		ApiKeyAuth
+//	@Param			id	path		int	true	"Request ID"
+//	@Success		200	{object}	models.HTTP_MESSAGE_ONLY_RESPONSE
+//	@Failure		400	{object}	models.Error
+//	@Failure		401	{object}	models.Error
+//	@Failure		404	{object}	models.Error
+//	@Failure		500	{object}	models.Error
+//	@Router			/wallet/requests/{id} [delete]
 func DeleteRequest(context *gin.Context) {
 
 	id, err := strconv.ParseInt(context.Param("id"), 10, 64)
@@ -366,6 +412,20 @@ func DeleteRequest(context *gin.Context) {
 
 }
 
+// GetUserRequest godoc
+//
+//	@Summary		Get request
+//	@Description	Get the money request you made and also have. You can differentiate the get by adding type query to be GIVER OR REQUESTER
+//	@Accept			json
+//	@Produce		json
+//	@Tags			Wallet
+//	@Param			type			query		string	false	"GIVER OR REQUESTER"
+//	@Failure		400				{object}	models.Error
+//	@Failure		401				{object}	models.Error
+//	@Failure		404				{object}	models.Error
+//	@Failure		500				{object}	models.Error
+//	@Success		200				{object}	models.HTTP_REQUEST_RESPONSE	"Request fetched successfully"
+//	@Router			/wallet/requests	[get]
 func GetUserRequests(context *gin.Context) {
 	user_id := context.GetInt64("user")
 
@@ -401,13 +461,28 @@ func GetUserRequests(context *gin.Context) {
 		}
 	}
 	context.JSON(http.StatusOK, gin.H{
-		"message": "Requests retrieved successfully",
+		"message": "Requests fetched successfully",
 		"data":    requests,
 		"count":   len(requests),
 	})
 
 }
 
+// RejectUserRequest godoc
+//
+//	@Summary		Reject a user money request
+//	@Description	Reject a user money request
+//	@Tags			Wallet
+//	@Accept			json
+//	@Produce		json
+//	@Security		ApiKeyAuth
+//	@Param			id	path		int								true	"Request ID"
+//	@Success		200	{object}	models.HTTP_REQUEST_RESPONSE	"Request rejected successfully"
+//	@Failure		400	{object}	models.Error
+//	@Failure		401	{object}	models.Error
+//	@Failure		404	{object}	models.Error
+//	@Failure		500	{object}	models.Error
+//	@Router			/wallet/requests/{id}/reject [post]
 func RejectRequest(context *gin.Context) {
 
 	// PARSE PARAMS
@@ -517,6 +592,21 @@ func RejectRequest(context *gin.Context) {
 
 }
 
+// AcceptUserRequest godoc
+//
+//	@Summary		Accept a user money request
+//	@Description	Accept a user money request
+//	@Tags			Wallet
+//	@Accept			json
+//	@Produce		json
+//	@Security		ApiKeyAuth
+//	@Param			id	path		int								true	"Request ID"
+//	@Success		200	{object}	models.HTTP_REQUEST_RESPONSE	"Request accepted successfully"
+//	@Failure		400	{object}	models.Error
+//	@Failure		401	{object}	models.Error
+//	@Failure		404	{object}	models.Error
+//	@Failure		500	{object}	models.Error
+//	@Router			/wallet/requests/{id}/accept [post]
 func ConfirmRequest(context *gin.Context) {
 
 	// PARSE PARAMS

@@ -9,3 +9,16 @@ type USER_REQUEST struct {
 	TransactionPin string `json:"transaction_pin" binding:"required"`
 	Tag            string `json:"tag" binding:"required"`
 }
+
+type DEPOSIT_BODY struct {
+	Amount float64 `json:"amount" binding:"required"`
+}
+
+type HTTP_REQUEST struct {
+	ID        int64   `json:"id"`
+	Requester int64   `json:"requester"`
+	Giver     int64   `json:"giver" binding:"required"`
+	Amount    float64 `json:"amount" binding:"required"`
+	Status    string  `json:"status"`
+	Remarks   string  `json:"remarks"`
+}

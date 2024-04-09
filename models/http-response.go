@@ -48,3 +48,8 @@ type HTTP_WALLET_RESPONSE struct {
 	Data    WALLET_REQUEST `json:"data"`
 	Message string         `json:"message"`
 }
+
+type HTTP_REQUEST_RESPONSE struct {
+	Data    HTTP_REQUEST `json:"data"`
+	Message string       `json:"message"`
+}

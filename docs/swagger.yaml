@@ -14,6 +14,13 @@ definitions:
     - id
     - transaction_pin
     type: object
+  models.DEPOSIT_BODY:
+    properties:
+      amount:
+        type: number
+    required:
+    - amount
+    type: object
   models.Error:
     properties:
       dev_reason:
@@ -32,6 +39,31 @@ definitions:
     type: object
   models.HTTP_MESSAGE_ONLY_RESPONSE:
     properties:
+      message:
+        type: string
+    type: object
+  models.HTTP_REQUEST:
+    properties:
+      amount:
+        type: number
+      giver:
+        type: integer
+      id:
+        type: integer
+      remarks:
+        type: string
+      requester:
+        type: integer
+      status:
+        type: string
+    required:
+    - amount
+    - giver
+    type: object
+  models.HTTP_REQUEST_RESPONSE:
+    properties:
+      data:
+        $ref: '#/definitions/models.HTTP_REQUEST'
       message:
         type: string
     type: object
@@ -538,6 +570,239 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Get Wallet
+      tags:
+      - Wallet
+  /wallet/deposit:
+    post:
+      consumes:
+      - application/json
+      description: Deposit money to your wallet
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.DEPOSIT_BODY'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: wallet updated successfully
+          schema:
+            $ref: '#/definitions/models.HTTP_TRANSACTION_BY_ID_RESPONSE'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Deposit money
+      tags:
+      - Wallet
+  /wallet/requests:
+    get:
+      consumes:
+      - application/json
+      description: Get the money request you made and also have. You can differentiate
+        the get by adding type query to be GIVER OR REQUESTER
+      parameters:
+      - description: GIVER OR REQUESTER
+        in: query
+        name: type
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Request fetched successfully
+          schema:
+            $ref: '#/definitions/models.HTTP_REQUEST_RESPONSE'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get request
+      tags:
+      - Wallet
+    post:
+      consumes:
+      - application/json
+      description: Request money from another user
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.HTTP_REQUEST'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Request successfully
+          schema:
+            $ref: '#/definitions/models.HTTP_MESSAGE_ONLY_RESPONSE'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Request money
+      tags:
+      - Wallet
+  /wallet/requests/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a request
+      parameters:
+      - description: Request ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.HTTP_MESSAGE_ONLY_RESPONSE'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a request
+      tags:
+      - Wallet
+  /wallet/requests/{id}/accept:
+    post:
+      consumes:
+      - application/json
+      description: Accept a user money request
+      parameters:
+      - description: Request ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Request accepted successfully
+          schema:
+            $ref: '#/definitions/models.HTTP_REQUEST_RESPONSE'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Accept a user money request
+      tags:
+      - Wallet
+  /wallet/requests/{id}/reject:
+    post:
+      consumes:
+      - application/json
+      description: Reject a user money request
+      parameters:
+      - description: Request ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Request rejected successfully
+          schema:
+            $ref: '#/definitions/models.HTTP_REQUEST_RESPONSE'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Reject a user money request
       tags:
       - Wallet
   /wallet/send:
