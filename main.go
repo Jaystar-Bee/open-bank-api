@@ -1,6 +1,8 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/Jaystar-Bee/open-bank-api/db"
 	doc "github.com/Jaystar-Bee/open-bank-api/docs"
 	"github.com/Jaystar-Bee/open-bank-api/routes"
@@ -20,6 +22,8 @@ import (
 //	@in							header
 //	@name						Authorization
 //	@BasePath					/
+
+var app *gin.Engine
 
 func init() {
 	err := godotenv.Load()
@@ -44,4 +48,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func Handler(w http.ResponseWriter, r *http.Request) {
+	app.ServeHTTP(w, r)
 }
