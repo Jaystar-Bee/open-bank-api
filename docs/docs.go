@@ -575,6 +575,11 @@ const docTemplate = `{
         },
         "/wallet/requests": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Get the money request you made and also have. You can differentiate the get by adding type query to be GIVER OR REQUESTER",
                 "consumes": [
                     "application/json"

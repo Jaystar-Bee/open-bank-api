@@ -419,6 +419,7 @@ func DeleteRequest(context *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Tags			Wallet
+//	@Security		ApiKeyAuth
 //	@Param			type			query		string	false	"GIVER OR REQUESTER"
 //	@Failure		400				{object}	models.Error
 //	@Failure		401				{object}	models.Error
