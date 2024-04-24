@@ -26,10 +26,10 @@ import (
 var app *gin.Engine
 
 func init() {
-	err := godotenv.Load()
-	if err != nil {
-		panic(err)
-	}
+	godotenv.Load()
+	// if err != nil {
+	// 	panic(err)
+	// }
 	db.InitDatabase()
 }
 
