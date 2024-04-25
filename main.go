@@ -6,6 +6,7 @@ import (
 	"github.com/Jaystar-Bee/open-bank-api/db"
 	doc "github.com/Jaystar-Bee/open-bank-api/docs"
 	"github.com/Jaystar-Bee/open-bank-api/routes"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	swaggerfiles "github.com/swaggo/files"
@@ -36,6 +37,8 @@ func init() {
 func main() {
 	server := gin.Default()
 	// DOCS
+
+	server.Use(cors.Default())
 	doc.SwaggerInfo.BasePath = "/"
 	server.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
