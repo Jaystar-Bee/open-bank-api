@@ -259,6 +259,15 @@ paths:
       - application/json
       description: You can get user transaction list and the list are paginated, which
         is 10 transactions per page by default.
+      parameters:
+      - description: Page number
+        in: query
+        name: page_number
+        type: integer
+      - description: Transactions per page
+        in: query
+        name: per_page
+        type: integer
       produces:
       - application/json
       responses:

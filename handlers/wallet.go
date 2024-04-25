@@ -420,12 +420,12 @@ func DeleteRequest(context *gin.Context) {
 //	@Produce		json
 //	@Tags			Wallet
 //	@Security		ApiKeyAuth
-//	@Param			type			query		string	false	"GIVER OR REQUESTER"
-//	@Failure		400				{object}	models.Error
-//	@Failure		401				{object}	models.Error
-//	@Failure		404				{object}	models.Error
-//	@Failure		500				{object}	models.Error
-//	@Success		200				{object}	models.HTTP_REQUEST_RESPONSE	"Request fetched successfully"
+//	@Param			type				query		string	false	"GIVER OR REQUESTER"
+//	@Failure		400					{object}	models.Error
+//	@Failure		401					{object}	models.Error
+//	@Failure		404					{object}	models.Error
+//	@Failure		500					{object}	models.Error
+//	@Success		200					{object}	models.HTTP_REQUEST_RESPONSE	"Request fetched successfully"
 //	@Router			/wallet/requests	[get]
 func GetUserRequests(context *gin.Context) {
 	user_id := context.GetInt64("user")

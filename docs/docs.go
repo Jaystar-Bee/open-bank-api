@@ -37,6 +37,20 @@ const docTemplate = `{
                     "Transactions"
                 ],
                 "summary": "Get user transaction list",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page number",
+                        "name": "page_number",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Transactions per page",
+                        "name": "per_page",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Ok",

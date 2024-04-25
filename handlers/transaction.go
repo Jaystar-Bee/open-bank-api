@@ -17,10 +17,12 @@ import (
 //	@Accept			json
 //	@Produce		json
 //	@Security		ApiKeyAuth
-//	@Success		200	{object}	models.HTTP_TRANSACTION_LIST_RESPONSE	"Ok"
-//	@Failure		400	{object}	models.Error							"Check queries"
-//	@Failure		404	{object}	models.Error							"User not found"
-//	@Failure		500	{object}	models.Error							"Unable to fetch transactions"
+//	@Param			page_number	query		int									false	"Page number"
+//	@Param			per_page	query		int									false	"Transactions per page"
+//	@Success		200			{object}	models.HTTP_TRANSACTION_LIST_RESPONSE	"Ok"
+//	@Failure		400			{object}	models.Error							"Check queries"
+//	@Failure		404			{object}	models.Error							"User not found"
+//	@Failure		500			{object}	models.Error							"Unable to fetch transactions"
 //	@Router			/transactions [get]
 func GetTransactions(context *gin.Context) {
 	user_id := context.GetInt64("user")
