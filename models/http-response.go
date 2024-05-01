@@ -1,8 +1,8 @@
 package models
 
 type HTTP_USER_RESPONSE struct {
-	Data    USER   `json:"data"`
-	Message string `json:"message"`
+	Data    USER_RESPONSE `json:"data"`
+	Message string        `json:"message"`
 }
 
 type HTTP_TOKEN_RESPONSE struct {

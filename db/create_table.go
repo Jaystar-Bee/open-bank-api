@@ -12,10 +12,12 @@ func CreateTables() {
 			transaction_pin TEXT NOT NULL,
 			tag TEXT UNIQUE NOT NULL,
 			phone TEXT,
+			avatar TEXT,
+			account_is_deactivated BOOLEAN NOT NULL,
 			is_verified BOOLEAN NOT NULL,
-			created_at TEXT,
-			updated_at TEXT,
-			deleted_at TEXT
+			created_at DATETIME,
+			updated_at DATETIME,
+			deleted_at DATETIME
 		)
 	`
 	_, err := MainDB.Exec(userTable)

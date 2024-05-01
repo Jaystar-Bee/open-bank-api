@@ -8,6 +8,7 @@ type USER_REQUEST struct {
 	Phone          string `json:"phone"`
 	TransactionPin string `json:"transaction_pin" binding:"required"`
 	Tag            string `json:"tag" binding:"required"`
+	Avatar         string `json:"avatar"`
 }
 
 type DEPOSIT_BODY struct {

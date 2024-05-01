@@ -3,6 +3,7 @@ package utils
 import (
 	"math/rand"
 	"net/mail"
+	"net/url"
 	"strconv"
 	"time"
 
@@ -56,4 +57,8 @@ func SetOTP(key, name string) {
 	db.RDB.Set(db.Ctx, key, otp, time.Minute+10)
 
 	emails.SendOTPToMail(key, name, otp)
+}
+
+func ConfirmURL(link string) (*url.URL, error) {
+	return url.ParseRequestURI(link)
 }

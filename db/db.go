@@ -28,7 +28,7 @@ func InitDatabase() {
 
 func initRedis() {
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     "redis-17492.c274.us-east-1-3.ec2.cloud.redislabs.com:17492",
+		Addr:     os.Getenv("REDIS_ADDRESS"),
 		Password: os.Getenv("REDIS_PASSWORD"),
 		DB:       0,
 	})

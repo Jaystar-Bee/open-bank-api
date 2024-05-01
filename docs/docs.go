@@ -134,6 +134,56 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/email/{email}": {
+            "get": {
+                "description": "Get user by email.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get user by email.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Email",
+                        "name": "email",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User fetched successfully",
+                        "schema": {
+                            "$ref": "#/definitions/models.HTTP_USER_RESPONSE"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/user/login": {
             "post": {
                 "description": "Log user in to the application.",
@@ -163,6 +213,56 @@ const docTemplate = `{
                         "description": "User logged in successfully",
                         "schema": {
                             "$ref": "#/definitions/models.HTTP_LOGIN_RESPONSE"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/phone/{phone}": {
+            "get": {
+                "description": "Get user by phone.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get user by phone.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Phone",
+                        "name": "phone",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User fetched successfully",
+                        "schema": {
+                            "$ref": "#/definitions/models.HTTP_USER_RESPONSE"
                         }
                     },
                     "400": {
@@ -284,107 +384,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/{email}": {
-            "get": {
-                "description": "Get user by email.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User"
-                ],
-                "summary": "Get user by email.",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User Email",
-                        "name": "tag",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "User fetched successfully",
-                        "schema": {
-                            "$ref": "#/definitions/models.HTTP_USER_RESPONSE"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.Error"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/models.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/user/{phone}": {
-            "get": {
-                "description": "Get user by phone.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User"
-                ],
-                "summary": "Get user by phone.",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User Phone",
-                        "name": "tag",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "User fetched successfully",
-                        "schema": {
-                            "$ref": "#/definitions/models.HTTP_USER_RESPONSE"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/models.Error"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/models.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/models.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/user/{tag}": {
+        "/user/tag/{tag}": {
             "get": {
                 "description": "Get user by tag.",
                 "consumes": [
@@ -451,7 +451,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "User Id",
-                        "name": "tag",
+                        "name": "user_id",
                         "in": "path",
                         "required": true
                     }
@@ -1075,7 +1075,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/models.TRANSACTION-models_USER"
+                    "$ref": "#/definitions/models.TRANSACTION-models_USER_RESPONSE"
                 },
                 "message": {
                     "type": "string"
@@ -1119,7 +1119,7 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "transactions": {
-                    "$ref": "#/definitions/models.TRANSACTION-models_USER"
+                    "$ref": "#/definitions/models.TRANSACTION-models_USER_RESPONSE"
                 }
             }
         },
@@ -1138,7 +1138,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/models.USER"
+                    "$ref": "#/definitions/models.USER_RESPONSE"
                 },
                 "message": {
                     "type": "string"
@@ -1156,7 +1156,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.TRANSACTION-models_USER": {
+        "models.TRANSACTION-models_USER_RESPONSE": {
             "type": "object",
             "required": [
                 "amount",
@@ -1180,7 +1180,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "receiver": {
-                    "$ref": "#/definitions/models.USER"
+                    "$ref": "#/definitions/models.USER_RESPONSE"
                 },
                 "receiver_wallet": {
                     "type": "integer"
@@ -1189,7 +1189,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "sender": {
-                    "$ref": "#/definitions/models.USER"
+                    "$ref": "#/definitions/models.USER_RESPONSE"
                 },
                 "sender_wallet": {
                     "type": "integer"
@@ -1213,6 +1213,12 @@ const docTemplate = `{
                 "transaction_pin"
             ],
             "properties": {
+                "account_is_deactivated": {
+                    "type": "boolean"
+                },
+                "avatar": {
+                    "type": "string"
+                },
                 "created_at": {
                     "type": "string"
                 },
@@ -1277,6 +1283,9 @@ const docTemplate = `{
                 "transaction_pin"
             ],
             "properties": {
+                "avatar": {
+                    "type": "string"
+                },
                 "email": {
                     "type": "string"
                 },
@@ -1296,6 +1305,47 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "transaction_pin": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.USER_RESPONSE": {
+            "type": "object",
+            "properties": {
+                "account_is_deactivated": {
+                    "type": "boolean"
+                },
+                "avatar": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_verified": {
+                    "type": "boolean"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "tag": {
+                    "type": "string"
+                },
+                "updated_at": {
                     "type": "string"
                 }
             }

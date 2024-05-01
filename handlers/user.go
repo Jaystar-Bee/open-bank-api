@@ -199,7 +199,7 @@ func RenewToken(context *gin.Context) {
 //	@Failure		400	{object}	models.Error
 //	@Failure		404	{object}	models.Error
 //	@Failure		500	{object}	models.Error
-//	@Router			/user/{tag} [get]
+//	@Router			/user/tag/{tag} [get]
 func GetUserByTag(context *gin.Context) {
 	tag := context.Param("tag")
 
@@ -231,12 +231,12 @@ func GetUserByTag(context *gin.Context) {
 //	@Summary		Get user by email.
 //	@Accept			json
 //	@Produce		json
-//	@Param			tag	path		string						true	"User Email"
+//	@Param			email	path		string						true	"User Email"
 //	@Success		200	{object}	models.HTTP_USER_RESPONSE	"User fetched successfully"
 //	@Failure		400	{object}	models.Error
 //	@Failure		404	{object}	models.Error
 //	@Failure		500	{object}	models.Error
-//	@Router			/user/{email} [get]
+//	@Router			/user/email/{email} [get]
 func GetUserByEmail(context *gin.Context) {
 	email := context.Param("email")
 
@@ -268,12 +268,12 @@ func GetUserByEmail(context *gin.Context) {
 //	@Summary		Get user by phone.
 //	@Accept			json
 //	@Produce		json
-//	@Param			tag	path		string						true	"User Phone"
+//	@Param			phone	path		string						true	"User Phone"
 //	@Success		200	{object}	models.HTTP_USER_RESPONSE	"User fetched successfully"
 //	@Failure		400	{object}	models.Error
 //	@Failure		404	{object}	models.Error
 //	@Failure		500	{object}	models.Error
-//	@Router			/user/{phone} [get]
+//	@Router			/user/phone/{phone} [get]
 func GetUserByPhone(context *gin.Context) {
 	phone := context.Param("phone")
 
@@ -305,7 +305,7 @@ func GetUserByPhone(context *gin.Context) {
 //	@Summary		Get user by Id.
 //	@Accept			json
 //	@Produce		json
-//	@Param			tag	path		string						true	"User Id"
+//	@Param			user_id	path		string						true	"User Id"
 //	@Success		200	{object}	models.HTTP_USER_RESPONSE	"User fetched successfully"
 //	@Failure		400	{object}	models.Error
 //	@Failure		404	{object}	models.Error
