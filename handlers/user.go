@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/Jaystar-Bee/open-bank-api/db"
 	"github.com/Jaystar-Bee/open-bank-api/jwt"
 	"github.com/Jaystar-Bee/open-bank-api/models"
 	"github.com/Jaystar-Bee/open-bank-api/utils"
@@ -16,10 +17,10 @@ import (
 func sendOTP(name, email string) error {
 	arrayOfNumbers := utils.GenerateUniqueNumbers(1, 99999)
 	otp := utils.JoinIntSlice(arrayOfNumbers)
-	time := time.Now().Format(time.RFC822)
+	date := time.Now().Format(time.RFC822)
 	template_data := map[string]any{
 		"OTP":      otp,
-		"Date":     time,
+		"Date":     date,
 		"Name":     name,
 		"Help":     os.Getenv("EMAIL_ACCOUNT"),
 		"HelpLink": "mailto:" + os.Getenv("EMAIL_ACCOUNT"),
@@ -31,6 +32,7 @@ func sendOTP(name, email string) error {
 	}
 	messageStatus := make(chan bool)
 	go utils.SendEmail(email, "Verify your OTP", body, messageStatus)
+	db.RDB.Set(db.Ctx, email, otp, time.Minute+10)
 	if <-messageStatus {
 		return nil
 	} else {
