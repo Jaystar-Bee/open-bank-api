@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -10,6 +12,31 @@ import (
 	"github.com/Jaystar-Bee/open-bank-api/utils"
 	"github.com/gin-gonic/gin"
 )
+
+func sendOTP(name, email string) error {
+	arrayOfNumbers := utils.GenerateUniqueNumbers(1, 99999)
+	otp := utils.JoinIntSlice(arrayOfNumbers)
+	time := time.Now().Format(time.RFC822)
+	template_data := map[string]any{
+		"OTP":      otp,
+		"Date":     time,
+		"Name":     name,
+		"Help":     os.Getenv("EMAIL_ACCOUNT"),
+		"HelpLink": "mailto:" + os.Getenv("EMAIL_ACCOUNT"),
+	}
+
+	body, err := utils.ParseTemplate("emails/templates/otp.html", template_data)
+	if err != nil {
+		return err
+	}
+	messageStatus := make(chan bool)
+	go utils.SendEmail(email, "Verify your OTP", body, messageStatus)
+	if <-messageStatus {
+		return nil
+	} else {
+		return errors.New("unable to send email")
+	}
+}
 
 // CreateTags 		godoc
 //
@@ -71,7 +98,6 @@ func CreateUser(context *gin.Context) {
 		})
 		return
 	}
-
 	err = user.Save()
 	if err != nil {
 		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
@@ -80,6 +106,15 @@ func CreateUser(context *gin.Context) {
 		})
 		return
 	}
+	err = sendOTP(user.FirstName+" "+user.LastName, user.Email)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message":    "Unable to send OTP",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
 	context.JSON(http.StatusOK, gin.H{
 		"message": "User created successfully",
 	})
