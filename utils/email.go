@@ -1,33 +1,34 @@
 package utils
 
 import (
+	"fmt"
+	"log"
+	"net"
+	"net/smtp"
 	"os"
-	"time"
 
-	"gopkg.in/gomail.v2"
+	"github.com/jordan-wright/email"
 )
 
 func SendEmail(to, subject, body string, status chan bool) {
-	// set up email
-	message := gomail.NewMessage()
-	message.SetHeader("From", os.Getenv("EMAIL_ACCOUNT"))
-	message.SetHeader("To", to)
-	message.SetHeader("Subject", subject)
-	message.SetBody("text/html", body)
-	// send email
-	data := gomail.NewDialer("smtp.example.com", 587, os.Getenv("EMAIL_ACCOUNT"), os.Getenv("EMAIL_PASSWORD"))
+	e := email.NewEmail()
+	e.From = fmt.Sprintf("Open Bank <%s>", os.Getenv("EMAIL_ACCOUNT"))
+	e.To = []string{to}
+	e.Subject = subject
+	e.HTML = []byte(body)
 
-	var err error
-
-	for i := 0; i < 3; i++ {
-		err = data.DialAndSend(message)
-		if err == nil {
-			status <- true
-			return
+	err := e.Send("smtp.gmail.com:587", smtp.PlainAuth("", os.Getenv("EMAIL_ACCOUNT"), os.Getenv("EMAIL_PASSWORD"), "smtp.gmail.com"))
+	if err != nil {
+		log.Printf("Failed to send email: %v", err)
+		if smtpErr, ok := err.(net.Error); ok && smtpErr.Timeout() {
+			log.Println("Temporary SMTP error, retrying later...")
+		} else {
+			log.Println("Permanent SMTP error, cannot retry.")
 		}
-		time.Sleep(time.Second * 4)
+		status <- false
+		return // Return the error instead of exiting
 	}
 
-	status <- false
-
+	fmt.Println("Email sent successfully!")
+	status <- true
 }
