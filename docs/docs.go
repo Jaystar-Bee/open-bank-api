@@ -434,6 +434,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/verify": {
+            "post": {
+                "description": "Verify Account",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Verify Account",
+                "parameters": [
+                    {
+                        "description": "OTP",
+                        "name": "otp",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.OTP"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Account verified successfully",
+                        "schema": {
+                            "$ref": "#/definitions/models.HTTP_LOGIN_RESPONSE"
+                        }
+                    },
+                    "400": {
+                        "description": "Unable to process request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Unable to process request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/user/{user_id}": {
             "get": {
                 "description": "Get user by Id.",
@@ -1152,6 +1198,17 @@ const docTemplate = `{
                     "$ref": "#/definitions/models.WALLET_REQUEST"
                 },
                 "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.OTP": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "otp": {
                     "type": "string"
                 }
             }

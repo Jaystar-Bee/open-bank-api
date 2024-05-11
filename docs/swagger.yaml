@@ -129,6 +129,13 @@ definitions:
       message:
         type: string
     type: object
+  models.OTP:
+    properties:
+      email:
+        type: string
+      otp:
+        type: string
+    type: object
   models.TRANSACTION-models_USER_RESPONSE:
     properties:
       amount:
@@ -587,6 +594,36 @@ paths:
           schema:
             $ref: '#/definitions/models.Error'
       summary: Get user by tag.
+      tags:
+      - User
+  /user/verify:
+    post:
+      consumes:
+      - application/json
+      description: Verify Account
+      parameters:
+      - description: OTP
+        in: body
+        name: otp
+        required: true
+        schema:
+          $ref: '#/definitions/models.OTP'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Account verified successfully
+          schema:
+            $ref: '#/definitions/models.HTTP_LOGIN_RESPONSE'
+        "400":
+          description: Unable to process request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Unable to process request
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Verify Account
       tags:
       - User
   /wallet:

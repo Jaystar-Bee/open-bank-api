@@ -18,6 +18,8 @@ func SendEmail(to, subject, body string, status chan bool) {
 	e.HTML = []byte(body)
 
 	err := e.Send("smtp.gmail.com:587", smtp.PlainAuth("", os.Getenv("EMAIL_ACCOUNT"), os.Getenv("EMAIL_PASSWORD"), "smtp.gmail.com"))
+
+	// err := e.Send("localhost:1025", smtp.PlainAuth("", os.Getenv("EMAIL_ACCOUNT"), os.Getenv("EMAIL_PASSWORD"), "localhost"))
 	if err != nil {
 		log.Printf("Failed to send email: %v", err)
 		if smtpErr, ok := err.(net.Error); ok && smtpErr.Timeout() {
@@ -28,7 +30,6 @@ func SendEmail(to, subject, body string, status chan bool) {
 		status <- false
 		return // Return the error instead of exiting
 	}
-
-	fmt.Println("Email sent successfully!")
 	status <- true
+	fmt.Println("Email sent successfully!")
 }

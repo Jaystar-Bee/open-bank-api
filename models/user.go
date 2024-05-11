@@ -30,6 +30,11 @@ type USER_LOGIN struct {
 	Password string `json:"password" binding:"required"`
 }
 
+type OTP struct {
+	Email string `json:"email"`
+	OTP   string `json:"otp"`
+}
+
 type USER_RESPONSE struct {
 	ID                   int64      `json:"id"`
 	FirstName            string     `json:"first_name"`
@@ -137,6 +142,21 @@ func (user *USER_RESPONSE) ConfirmPin(pin string) error {
 		return err
 	}
 	err = utils.CompareHash(dbPin, pin)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (user *USER_RESPONSE) UpdateUser() error {
+	query := `UPDATE users SET first_name = $1, last_name = $2, email = $3, phone = $4, tag = $5, is_verified = $6, avatar = $7, account_is_deactivated = $8, updated_at = $9 WHERE id = $10`
+
+	statement, err := db.MainDB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+	_, err = statement.Exec(user.FirstName, user.LastName, user.Email, user.Phone, user.Tag, user.IsVerified, user.Avatar, user.AccountIsDeactivated, utils.NowTime(), user.ID)
 	if err != nil {
 		return err
 	}

@@ -31,13 +31,91 @@ func sendOTP(name, email string) error {
 		return err
 	}
 	messageStatus := make(chan bool)
-	go utils.SendEmail(email, "Verify your OTP", body, messageStatus)
+	go utils.SendEmail(email, "Verify your Account", body, messageStatus)
 	db.RDB.Set(db.Ctx, email, otp, time.Minute+10)
 	if <-messageStatus {
 		return nil
 	} else {
 		return errors.New("unable to send email")
 	}
+}
+
+// VerifyAccount godoc
+//
+//	@Summary		Verify Account
+//	@Description	Verify Account
+//	@Tags			User
+//	@Accept			json
+//	@Produce		json
+//	@Param			otp	body		models.OTP					true	"OTP"
+//	@Success		200	{object}	models.HTTP_LOGIN_RESPONSE	"Account verified successfully"
+//	@Failure		400	{object}	models.Error				"Unable to process request"
+//	@Failure		500	{object}	models.Error				"Unable to process request"
+//	@Router			/user/verify [post]
+func VerifyAccount(context *gin.Context) {
+	var otp models.OTP
+
+	// CHECK OTP
+	err := context.ShouldBindJSON(&otp)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message":    "Unable to process request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+	// CHECK OTP EXPIRATION AND IF USER EXIST
+	email := otp.Email
+	user, err := models.GetUserByEmail(email)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message": "User not found",
+		})
+		return
+	}
+	otp_db, err := db.RDB.Get(db.Ctx, email).Result()
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message": "OTP expired",
+		})
+		return
+	}
+
+	// CHECK OTP
+	if otp_db != otp.OTP {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message": "OTP is invalid",
+		})
+		return
+	}
+
+	// VERIFY ACCOUNT AND UPDATE ACCOUNT
+	user.IsVerified = true
+	err = user.UpdateUser()
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message":    "Unable to process request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	// GENERATE JWT
+	token, err := jwt.GenerateJWT(user.ID, user.Email, time.Now().Add(time.Hour*24).Unix())
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message":    "Unable to process request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	// SEND DATA
+	context.JSON(http.StatusOK, gin.H{
+		"message": "Account verified successfully",
+		"data":    user,
+		"token":   token,
+	})
 }
 
 // CreateTags 		godoc
@@ -269,10 +347,10 @@ func GetUserByTag(context *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			email	path		string						true	"User Email"
-//	@Success		200	{object}	models.HTTP_USER_RESPONSE	"User fetched successfully"
-//	@Failure		400	{object}	models.Error
-//	@Failure		404	{object}	models.Error
-//	@Failure		500	{object}	models.Error
+//	@Success		200		{object}	models.HTTP_USER_RESPONSE	"User fetched successfully"
+//	@Failure		400		{object}	models.Error
+//	@Failure		404		{object}	models.Error
+//	@Failure		500		{object}	models.Error
 //	@Router			/user/email/{email} [get]
 func GetUserByEmail(context *gin.Context) {
 	email := context.Param("email")
@@ -306,10 +384,10 @@ func GetUserByEmail(context *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			phone	path		string						true	"User Phone"
-//	@Success		200	{object}	models.HTTP_USER_RESPONSE	"User fetched successfully"
-//	@Failure		400	{object}	models.Error
-//	@Failure		404	{object}	models.Error
-//	@Failure		500	{object}	models.Error
+//	@Success		200		{object}	models.HTTP_USER_RESPONSE	"User fetched successfully"
+//	@Failure		400		{object}	models.Error
+//	@Failure		404		{object}	models.Error
+//	@Failure		500		{object}	models.Error
 //	@Router			/user/phone/{phone} [get]
 func GetUserByPhone(context *gin.Context) {
 	phone := context.Param("phone")
@@ -343,10 +421,10 @@ func GetUserByPhone(context *gin.Context) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			user_id	path		string						true	"User Id"
-//	@Success		200	{object}	models.HTTP_USER_RESPONSE	"User fetched successfully"
-//	@Failure		400	{object}	models.Error
-//	@Failure		404	{object}	models.Error
-//	@Failure		500	{object}	models.Error
+//	@Success		200		{object}	models.HTTP_USER_RESPONSE	"User fetched successfully"
+//	@Failure		400		{object}	models.Error
+//	@Failure		404		{object}	models.Error
+//	@Failure		500		{object}	models.Error
 //	@Router			/user/{user_id} [get]
 func GetUserById(context *gin.Context) {
 	id := context.Param("id")
