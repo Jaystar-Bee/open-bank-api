@@ -15,9 +15,9 @@ func CreateTables() {
 			avatar TEXT,
 			account_is_deactivated BOOLEAN NOT NULL,
 			is_verified BOOLEAN NOT NULL,
-			created_at DATETIME,
-			updated_at DATETIME,
-			deleted_at DATETIME
+			created_at TIMESTAMP,
+			updated_at TIMESTAMP,
+			deleted_at TIMESTAMP
 		)
 	`
 	_, err := MainDB.Exec(userTable)
