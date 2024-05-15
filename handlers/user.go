@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"strconv"
@@ -17,9 +18,11 @@ import (
 func sendOTP(name, email string) error {
 	otp := utils.GenerateUniqueNumbers(1000, 9999)
 	date := time.Now().Format(time.RFC822)
+	expTime := 10
 	template_data := map[string]any{
 		"OTP":      otp,
 		"Date":     date,
+		"Time":     expTime,
 		"Name":     name,
 		"Help":     os.Getenv("EMAIL_ACCOUNT"),
 		"HelpLink": "mailto:" + os.Getenv("EMAIL_ACCOUNT"),
@@ -31,7 +34,7 @@ func sendOTP(name, email string) error {
 	}
 	messageStatus := make(chan bool)
 	go utils.SendEmail(email, "Verify your Account", body, messageStatus)
-	db.RDB.Set(db.Ctx, email, otp, time.Minute+10)
+	db.RDB.Set(db.Ctx, email, otp, time.Minute+time.Duration(expTime))
 	if <-messageStatus {
 		return nil
 	} else {
@@ -114,6 +117,53 @@ func VerifyAccount(context *gin.Context) {
 		"message": "Account verified successfully",
 		"data":    user,
 		"token":   token,
+	})
+}
+
+// SendOTP godoc
+//
+//	@summary		Send OTP
+//	@description	Send OTP
+//	@Tags			User
+//	@accept			json
+//	@produce		json
+//	@param			user	body		models.OTP_REQUEST					true	"User"
+//	@success		200		{object}	models.HTTP_MESSAGE_ONLY_RESPONSE	"OTP sent successfully"
+//	@failure		400		{object}	models.Error						"Unable to process request"
+//	@failure		400		{object}	models.Error						"Invalid email"
+//	@failure		500		{object}	models.Error						"Unable to process request"
+//	@router			/user/sendotp [post]
+func SendOTP(context *gin.Context) {
+	var userOTP models.OTP_REQUEST
+	err := context.ShouldBindJSON(&userOTP)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message":    "Unable to process request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+	if !utils.IsValidEmail(userOTP.Email) {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message": "Invalid email",
+		})
+		return
+	}
+	user, _ := models.GetUserByEmail(userOTP.Email)
+	if user.ID > 0 {
+		err = sendOTP(fmt.Sprint(user.FirstName, " ", user.LastName), userOTP.Email)
+	} else {
+		err = sendOTP(userOTP.Name, userOTP.Email)
+	}
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message":    "Unable to send OTP",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+	context.JSON(http.StatusOK, gin.H{
+		"message": "OTP sent successfully",
 	})
 }
 

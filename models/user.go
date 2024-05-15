@@ -35,6 +35,11 @@ type OTP struct {
 	OTP   string `json:"otp"`
 }
 
+type OTP_REQUEST struct {
+	Email string `json:"email" binding:"required"`
+	Name  string `json:"name"`
+}
+
 type USER_RESPONSE struct {
 	ID                   int64      `json:"id"`
 	FirstName            string     `json:"first_name"`

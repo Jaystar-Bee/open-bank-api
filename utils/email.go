@@ -17,7 +17,12 @@ func SendEmail(to, subject, body string, status chan bool) {
 	e.Subject = subject
 	e.HTML = []byte(body)
 
-	err := e.Send(fmt.Sprint(os.Getenv("MAIL_HOST"), ":587"), smtp.PlainAuth("", os.Getenv("MAIL_USERNAME"), os.Getenv("SMT_TOKEN"), os.Getenv("MAIL_HOST")))
+	var err error
+	if os.Getenv("ENV") == "development" {
+		err = e.Send("localhost:1025", nil)
+	} else {
+		err = e.Send(fmt.Sprint(os.Getenv("MAIL_HOST"), ":587"), smtp.PlainAuth("", os.Getenv("MAIL_USERNAME"), os.Getenv("SMT_TOKEN"), os.Getenv("MAIL_HOST")))
+	}
 
 	if err != nil {
 		log.Printf("Failed to send email: %v", err)

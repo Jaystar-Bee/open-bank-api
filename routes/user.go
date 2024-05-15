@@ -15,5 +15,6 @@ func UserRoutes(server *gin.Engine) {
 	userRoute.GET("/:id", handlers.GetUserById)
 	userRoute.POST("/login", handlers.Login)
 	userRoute.POST("/verify", handlers.VerifyAccount)
+	userRoute.POST("/sendotp", handlers.SendOTP)
 	userRoute.GET("/renew", middlewares.CheckAuthentication, handlers.RenewToken)
 }
