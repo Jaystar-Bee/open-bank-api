@@ -15,8 +15,7 @@ import (
 )
 
 func sendOTP(name, email string) error {
-	arrayOfNumbers := utils.GenerateUniqueNumbers(1, 99999)
-	otp := utils.JoinIntSlice(arrayOfNumbers)
+	otp := utils.GenerateUniqueNumbers(1000, 9999)
 	date := time.Now().Format(time.RFC822)
 	template_data := map[string]any{
 		"OTP":      otp,
