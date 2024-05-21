@@ -32,7 +32,7 @@ type USER_LOGIN struct {
 
 type OTP struct {
 	Email string `json:"email"`
-	OTP   string `json:"otp"`
+	OTP   string `json:"otp" binding:"required"`
 }
 
 type OTP_REQUEST struct {

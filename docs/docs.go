@@ -480,6 +480,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/toggle-account-deactivation": {
+            "post": {
+                "description": "Toggle account activation",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Toggle account activation",
+                "parameters": [
+                    {
+                        "description": "OTP",
+                        "name": "otp",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.OTP"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Account activated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/models.HTTP_LOGIN_RESPONSE"
+                        }
+                    },
+                    "400": {
+                        "description": "Unable to process request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Unable to process request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/user/verify": {
             "post": {
                 "description": "Verify Account",
@@ -1250,6 +1296,9 @@ const docTemplate = `{
         },
         "models.OTP": {
             "type": "object",
+            "required": [
+                "otp"
+            ],
             "properties": {
                 "email": {
                     "type": "string"

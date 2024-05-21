@@ -42,6 +42,89 @@ func sendOTP(name, email string) error {
 	}
 }
 
+// ToggleAccountDeactivation godoc
+//
+//	@Summary		Toggle account activation
+//
+//	@Description	Toggle account activation
+//	@Tags			User
+//	@Accept			json
+//	@Produce		json
+//	@Param			otp	body		models.OTP							true	"OTP"
+//	@Success		200	{object}	models.HTTP_MESSAGE_ONLY_RESPONSE	"Account deactivated successfully"
+//	@Success		200	{object}	models.HTTP_LOGIN_RESPONSE			"Account activated successfully"
+//	@Failure		400	{object}	models.Error						"Unable to process request"
+//	@Failure		500	{object}	models.Error						"Unable to process request"
+//	@Router			/user/toggle-account-deactivation [post]
+func ToogleAccountDeactivation(context *gin.Context) {
+	userId := context.GetInt64("user")
+	var otpDetail models.OTP
+	err := context.ShouldBindJSON(&otpDetail)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message":    "Unable to process request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	user, err := models.GetUserByID(userId)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message":    "User not found",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	// CHECK OTP
+	otp_db, err := db.RDB.Get(db.Ctx, user.Email).Result()
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message":    "OTP Expired",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	if otpDetail.OTP != otp_db {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message": "OTP is invalid",
+		})
+		return
+	}
+
+	user.AccountIsDeactivated = !user.AccountIsDeactivated
+	err = user.UpdateUser()
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message":    "Unable to process request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	if user.AccountIsDeactivated {
+		context.JSON(http.StatusOK, gin.H{
+			"message": "Account deactivated successfully",
+		})
+	} else {
+		var token, err = jwt.GenerateJWT(user.ID, user.Email, time.Now().Add(time.Hour*24).Unix())
+		if err != nil {
+			context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"message":    "Unable to process request",
+				"dev_reason": err.Error(),
+			})
+			return
+		}
+		context.JSON(http.StatusAccepted, gin.H{
+			"message": "Account activated successfully",
+			"data":    user,
+			"token":   token,
+		})
+	}
+}
+
 // VerifyAccount godoc
 //
 //	@Summary		Verify Account
@@ -71,14 +154,16 @@ func VerifyAccount(context *gin.Context) {
 	user, err := models.GetUserByEmail(email)
 	if err != nil {
 		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"message": "User not found",
+			"message":    "User not found",
+			"dev_reason": err.Error(),
 		})
 		return
 	}
 	otp_db, err := db.RDB.Get(db.Ctx, email).Result()
 	if err != nil {
 		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"message": "OTP expired",
+			"message":    "OTP expired",
+			"dev_reason": err.Error(),
 		})
 		return
 	}

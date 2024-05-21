@@ -135,6 +135,8 @@ definitions:
         type: string
       otp:
         type: string
+    required:
+    - otp
     type: object
   models.OTP_REQUEST:
     properties:
@@ -633,6 +635,36 @@ paths:
           schema:
             $ref: '#/definitions/models.Error'
       summary: Get user by tag.
+      tags:
+      - User
+  /user/toggle-account-deactivation:
+    post:
+      consumes:
+      - application/json
+      description: Toggle account activation
+      parameters:
+      - description: OTP
+        in: body
+        name: otp
+        required: true
+        schema:
+          $ref: '#/definitions/models.OTP'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Account activated successfully
+          schema:
+            $ref: '#/definitions/models.HTTP_LOGIN_RESPONSE'
+        "400":
+          description: Unable to process request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Unable to process request
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Toggle account activation
       tags:
       - User
   /user/verify:

@@ -17,4 +17,5 @@ func UserRoutes(server *gin.Engine) {
 	userRoute.POST("/verify", handlers.VerifyAccount)
 	userRoute.POST("/sendotp", handlers.SendOTP)
 	userRoute.GET("/renew", middlewares.CheckAuthentication, handlers.RenewToken)
+	userRoute.GET("/user/toggle-account-deactivation", middlewares.CheckAuthentication, handlers.ToogleAccountDeactivation)
 }
