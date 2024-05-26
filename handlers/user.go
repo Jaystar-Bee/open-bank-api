@@ -334,6 +334,62 @@ func CreateUser(context *gin.Context) {
 	})
 }
 
+// EditUser godoc
+//
+//	@Summary		Edit User
+//	@Description	Edit User
+//	@Tags			User
+//	@Accept			json
+//	@Produce		json
+//	@Param			user	body		models.USER_EDIT					true	"Edit User"
+//	@Success		200		{object}	models.HTTP_MESSAGE_ONLY_RESPONSE	"User updated successfully"
+//	@Failure		400		{object}	models.Error						"Unable to process request"
+//	@Failure		404		{object}	models.Error						"User not found"
+//	@Failure		500		{object}	models.Error						"Unable to process request"
+//	@Router			/user/edit [post]
+func EditUser(context *gin.Context) {
+	var editData models.USER_EDIT
+	userId := context.GetInt64("user")
+
+	err := context.ShouldBindJSON(&editData)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message":    "Unable to process request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	user, err := models.GetUserByID(userId)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+			"message":    "User not found",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+	user.FirstName = editData.FirstName
+	user.LastName = editData.LastName
+	user.Phone = editData.Phone
+	user.Tag = editData.Tag
+	user.Avatar = editData.Avatar
+
+	err = user.UpdateUser()
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message":    "Unable to process request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{
+		"message": "User updated successfully",
+		"data":    user,
+	})
+
+}
+
 // LogUserIn		godoc
 //
 //	@Tags			User

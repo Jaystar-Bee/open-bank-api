@@ -134,6 +134,58 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/edit": {
+            "post": {
+                "description": "Edit User",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Edit User",
+                "parameters": [
+                    {
+                        "description": "Edit User",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.USER_EDIT"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/models.HTTP_MESSAGE_ONLY_RESPONSE"
+                        }
+                    },
+                    "400": {
+                        "description": "Unable to process request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Unable to process request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/user/email/{email}": {
             "get": {
                 "description": "Get user by email.",
@@ -1419,6 +1471,31 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.USER_EDIT": {
+            "type": "object",
+            "required": [
+                "first_name",
+                "last_name",
+                "tag"
+            ],
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "tag": {
                     "type": "string"
                 }
             }

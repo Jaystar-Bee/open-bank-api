@@ -11,6 +11,14 @@ type USER_REQUEST struct {
 	Avatar         string `json:"avatar"`
 }
 
+type USER_EDIT struct {
+	FirstName string  `json:"first_name" binding:"required"`
+	LastName  string  `json:"last_name" binding:"required"`
+	Phone     string  `json:"phone"`
+	Tag       string  `json:"tag" binding:"required"`
+	Avatar    *string `json:"avatar"`
+}
+
 type DEPOSIT_BODY struct {
 	Amount float64 `json:"amount" binding:"required"`
 }

@@ -17,5 +17,10 @@ func UserRoutes(server *gin.Engine) {
 	userRoute.POST("/verify", handlers.VerifyAccount)
 	userRoute.POST("/sendotp", handlers.SendOTP)
 	userRoute.GET("/renew", middlewares.CheckAuthentication, handlers.RenewToken)
+	userRoute.PUT("/edit", middlewares.CheckAuthentication, handlers.EditUser)
+	userRoute.PATCH("/change-password", nil)
+	userRoute.PATCH("/change-pin", nil)
+	userRoute.PATCH("/reset-password", nil)
+	userRoute.PATCH("/change-email", nil)
 	userRoute.POST("/toggle-account-deactivation", middlewares.CheckAuthentication, handlers.ToogleAccountDeactivation)
 }
