@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/Jaystar-Bee/open-bank-api/jwt"
+	"github.com/Jaystar-Bee/open-bank-api/models"
 	"github.com/gin-gonic/gin"
 )
 
@@ -35,5 +36,22 @@ func CheckAuthentication(context *gin.Context) {
 
 	context.Set("user", user)
 	context.Set("email", email)
+	context.Next()
+}
+
+func CheckAccountActivation(context *gin.Context) {
+	userId := context.GetInt64("user")
+
+	user, err := models.GetUserByID(userId)
+
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusNotFound, gin.H{"message": "User not Found", "dev_reason": err.Error()})
+		return
+	}
+	if user.AccountIsDeactivated {
+		context.AbortWithStatusJSON(http.StatusForbidden, gin.H{"message": "Account is deactivated"})
+		return
+	}
+
 	context.Next()
 }
