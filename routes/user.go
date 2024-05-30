@@ -22,6 +22,6 @@ func UserRoutes(server *gin.Engine) {
 	// userRoute.PATCH("/change-pin",nil)
 	userRoute.PATCH("/change-pin", middlewares.CheckAuthentication, middlewares.CheckAccountActivation, handlers.ChangeUserPin)
 	userRoute.PATCH("/change-password", middlewares.CheckAuthentication, middlewares.CheckAccountActivation, handlers.ChangeUserPassword)
-	userRoute.PATCH("/change-email", middlewares.CheckAuthentication, middlewares.CheckAccountActivation, nil)
+	// userRoute.PATCH("/change-email", middlewares.CheckAuthentication, middlewares.CheckAccountActivation, nil)
 	userRoute.POST("/toggle-account-deactivation", middlewares.CheckAuthentication, handlers.ToogleAccountDeactivation)
 }
