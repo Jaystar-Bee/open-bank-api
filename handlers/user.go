@@ -708,18 +708,18 @@ func ChangeUserPin(context *gin.Context) {
 
 // ChangeUserPassword godoc
 //
-// @Summary	Change user password.
-// @Description Change user password
-// @Tags		User
-// @Accept		json
-// @Produce	json
-// @Security	ApiKeyAuth
-// @Param		password	body		models.CHANGE_PASSWORD	true	"User Password"
-// @Success	200		{object}	models.HTTP_USER_RESPONSE	"User fetched successfully"
-// @Failure	400		{object}	models.Error
-// @Failure	404		{object}	models.Error
-// @Failure	500		{object}	models.Error
-// @Router		/user/change-password [patch]
+//	@Summary		Change user password.
+//	@Description	Change user password
+//	@Tags			User
+//	@Accept			json
+//	@Produce		json
+//	@Security		ApiKeyAuth
+//	@Param			password	body		models.CHANGE_PASSWORD		true	"User Password"
+//	@Success		200			{object}	models.HTTP_USER_RESPONSE	"User fetched successfully"
+//	@Failure		400			{object}	models.Error
+//	@Failure		404			{object}	models.Error
+//	@Failure		500			{object}	models.Error
+//	@Router			/user/change-password [patch]
 func ChangeUserPassword(context *gin.Context) {
 	var passwordData models.CHANGE_PASSWORD
 	userId := context.GetInt64("user")

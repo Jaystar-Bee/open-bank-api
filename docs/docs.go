@@ -134,8 +134,65 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/change-password": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Change user password",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Change user password.",
+                "parameters": [
+                    {
+                        "description": "User Password",
+                        "name": "password",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CHANGE_PASSWORD"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User fetched successfully",
+                        "schema": {
+                            "$ref": "#/definitions/models.HTTP_USER_RESPONSE"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/user/change-pin": {
-            "post": {
+            "patch": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -1221,6 +1278,21 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "transaction_pin": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CHANGE_PASSWORD": {
+            "type": "object",
+            "required": [
+                "new_password",
+                "old_password"
+            ],
+            "properties": {
+                "new_password": {
+                    "type": "string"
+                },
+                "old_password": {
                     "type": "string"
                 }
             }

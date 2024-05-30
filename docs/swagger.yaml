@@ -14,6 +14,16 @@ definitions:
     - id
     - transaction_pin
     type: object
+  models.CHANGE_PASSWORD:
+    properties:
+      new_password:
+        type: string
+      old_password:
+        type: string
+    required:
+    - new_password
+    - old_password
+    type: object
   models.CHANGE_PIN:
     properties:
       new_pin:
@@ -438,8 +448,44 @@ paths:
       summary: Get user by Id.
       tags:
       - User
+  /user/change-password:
+    patch:
+      consumes:
+      - application/json
+      description: Change user password
+      parameters:
+      - description: User Password
+        in: body
+        name: password
+        required: true
+        schema:
+          $ref: '#/definitions/models.CHANGE_PASSWORD'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User fetched successfully
+          schema:
+            $ref: '#/definitions/models.HTTP_USER_RESPONSE'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Change user password.
+      tags:
+      - User
   /user/change-pin:
-    post:
+    patch:
       consumes:
       - application/json
       description: Change user pin.
