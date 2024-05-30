@@ -652,7 +652,7 @@ func GetUserById(context *gin.Context) {
 //	@Failure		400	{object}	models.Error
 //	@Failure		404	{object}	models.Error
 //	@Failure		500	{object}	models.Error
-//	@Router			/user/change-pin [post]
+//	@Router			/user/change-pin [patch]
 func ChangeUserPin(context *gin.Context) {
 	var pinData models.CHANGE_PIN
 	userId := context.GetInt64("user")
@@ -704,4 +704,70 @@ func ChangeUserPin(context *gin.Context) {
 		"message": "Pin updated successfully",
 	})
 
+}
+
+// ChangeUserPassword godoc
+//
+// @Summary	Change user password.
+// @Description Change user password
+// @Tags		User
+// @Accept		json
+// @Produce	json
+// @Security	ApiKeyAuth
+// @Param		password	body		models.CHANGE_PASSWORD	true	"User Password"
+// @Success	200		{object}	models.HTTP_USER_RESPONSE	"User fetched successfully"
+// @Failure	400		{object}	models.Error
+// @Failure	404		{object}	models.Error
+// @Failure	500		{object}	models.Error
+// @Router		/user/change-password [patch]
+func ChangeUserPassword(context *gin.Context) {
+	var passwordData models.CHANGE_PASSWORD
+	userId := context.GetInt64("user")
+	err := context.ShouldBindJSON(&passwordData)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message":    "Unable to process request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	user, err := models.GetUserByID(userId)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+			"message":    "User not found",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+	err = user.ConfirmPin(passwordData.OldPassword)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message":    "Invalid old password",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	newPassword, err := utils.HashText(passwordData.NewPassword)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message":    "Unable to secure new password",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	err = user.UpdatePassword(newPassword)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message":    "Unable to update password",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{
+		"message": "Password updated successfully",
+	})
 }

@@ -27,6 +27,10 @@ type CHANGE_PIN struct {
 	OldPin string `json:"old_pin" binding:"required"`
 	NewPin string `json:"new_pin" binding:"required"`
 }
+type CHANGE_PASSWORD struct {
+	OldPassword string `json:"old_password" binding:"required"`
+	NewPassword string `json:"new_password" binding:"required"`
+}
 
 type HTTP_REQUEST struct {
 	ID        int64   `json:"id"`
