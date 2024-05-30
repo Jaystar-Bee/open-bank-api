@@ -638,3 +638,70 @@ func GetUserById(context *gin.Context) {
 		"data":    user,
 	})
 }
+
+// ChangeUserPin	godoc
+//
+//	@Tags			User
+//	@Description	Change user pin.
+//	@Summary		Change user pin.
+//	@Accept			json
+//	@Produce		json
+//	@Security		ApiKeyAuth
+//	@Param			pin	body		models.CHANGE_PIN			true	"User Pin"
+//	@Success		200	{object}	models.HTTP_USER_RESPONSE	"User fetched successfully"
+//	@Failure		400	{object}	models.Error
+//	@Failure		404	{object}	models.Error
+//	@Failure		500	{object}	models.Error
+//	@Router			/user/change-pin [post]
+func ChangeUserPin(context *gin.Context) {
+	var pinData models.CHANGE_PIN
+	userId := context.GetInt64("user")
+	err := context.ShouldBindJSON(&pinData)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message":    "Unable to process request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	user, err := models.GetUserByID(userId)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+			"message":    "User not found",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	err = user.ConfirmPin(pinData.OldPin)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message":    "Invalid old pin",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+	newPin, err := utils.HashText(pinData.NewPin)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message":    "Unable to secure new pin",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	err = user.UpdatePin(newPin)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message":    "Unable to update pin",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{
+		"message": "Pin updated successfully",
+	})
+
+}

@@ -23,6 +23,11 @@ type DEPOSIT_BODY struct {
 	Amount float64 `json:"amount" binding:"required"`
 }
 
+type CHANGE_PIN struct {
+	OldPin string `json:"old_pin" binding:"required"`
+	NewPin string `json:"new_pin" binding:"required"`
+}
+
 type HTTP_REQUEST struct {
 	ID        int64   `json:"id"`
 	Requester int64   `json:"requester"`

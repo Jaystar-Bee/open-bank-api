@@ -134,6 +134,63 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/change-pin": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Change user pin.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Change user pin.",
+                "parameters": [
+                    {
+                        "description": "User Pin",
+                        "name": "pin",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CHANGE_PIN"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User fetched successfully",
+                        "schema": {
+                            "$ref": "#/definitions/models.HTTP_USER_RESPONSE"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/user/edit": {
             "post": {
                 "description": "Edit User",
@@ -1164,6 +1221,21 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "transaction_pin": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CHANGE_PIN": {
+            "type": "object",
+            "required": [
+                "new_pin",
+                "old_pin"
+            ],
+            "properties": {
+                "new_pin": {
+                    "type": "string"
+                },
+                "old_pin": {
                     "type": "string"
                 }
             }

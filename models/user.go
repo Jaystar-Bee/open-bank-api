@@ -153,6 +153,20 @@ func (user *USER_RESPONSE) ConfirmPin(pin string) error {
 	return nil
 }
 
+func (user *USER_RESPONSE) ConfirmPassword(password string) error {
+	query := `SELECT password FROM users WHERE id = $1`
+	var dbPassword string
+	err := db.MainDB.QueryRow(query, user.ID).Scan(&dbPassword)
+	if err != nil {
+		return err
+	}
+	err = utils.CompareHash(dbPassword, password)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (user *USER_RESPONSE) UpdateUser() error {
 	query := `UPDATE users SET first_name = $1, last_name = $2, email = $3, phone = $4, tag = $5, is_verified = $6, avatar = $7, account_is_deactivated = $8, updated_at = $9 WHERE id = $10`
 
@@ -166,4 +180,28 @@ func (user *USER_RESPONSE) UpdateUser() error {
 		return err
 	}
 	return nil
+}
+func (user *USER_RESPONSE) UpdatePassword(hashPassword string) error {
+	query := `UPDATE users SET password = $1, updated_at = $2 WHERE id = $3`
+
+	statement, err := db.MainDB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+	_, err = statement.Exec(hashPassword, utils.NowTime(), user.ID)
+	return err
+}
+
+func (user *USER_RESPONSE) UpdatePin(hashPin string) error {
+	query := `UPDATE users SET transaction_pin = $1, updated_at = $2 WHERE id = $3`
+
+	statement, err := db.MainDB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	_, err = statement.Exec(hashPin, utils.NowTime(), user.ID)
+	return err
 }
