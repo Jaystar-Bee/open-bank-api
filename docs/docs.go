@@ -562,6 +562,75 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/reset-pin": {
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Reset user pin with otp",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Reset User Pin",
+                "parameters": [
+                    {
+                        "description": "User Pin \u0026 Otp",
+                        "name": "pin",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.RESET_PIN"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Pin Reset successfully",
+                        "schema": {
+                            "$ref": "#/definitions/models.HTTP_USER_RESPONSE"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "417": {
+                        "description": "Expectation Failed",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/user/sendotp": {
             "post": {
                 "description": "Send OTP",
@@ -1597,6 +1666,21 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.RESET_PIN": {
+            "type": "object",
+            "required": [
+                "otp",
+                "pin"
+            ],
+            "properties": {
+                "otp": {
+                    "type": "string"
+                },
+                "pin": {
                     "type": "string"
                 }
             }

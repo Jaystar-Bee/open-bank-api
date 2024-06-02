@@ -33,6 +33,10 @@ type RESET_PASSWORD struct {
 	Email    string `json:"email" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
+type RESET_PIN struct {
+	OTP string `json:"otp" binding:"required"`
+	Pin string `json:"pin" binding:"required"`
+}
 type CHANGE_PASSWORD struct {
 	OldPassword string `json:"old_password" binding:"required"`
 	NewPassword string `json:"new_password" binding:"required"`

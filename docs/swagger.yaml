@@ -180,6 +180,16 @@ definitions:
     - otp
     - password
     type: object
+  models.RESET_PIN:
+    properties:
+      otp:
+        type: string
+      pin:
+        type: string
+    required:
+    - otp
+    - pin
+    type: object
   models.TRANSACTION-models_USER_RESPONSE:
     properties:
       amount:
@@ -736,6 +746,50 @@ paths:
           schema:
             $ref: '#/definitions/models.Error'
       summary: Reset User Password
+      tags:
+      - User
+  /user/reset-pin:
+    patch:
+      consumes:
+      - application/json
+      description: Reset user pin with otp
+      parameters:
+      - description: User Pin & Otp
+        in: body
+        name: pin
+        required: true
+        schema:
+          $ref: '#/definitions/models.RESET_PIN'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Pin Reset successfully
+          schema:
+            $ref: '#/definitions/models.HTTP_USER_RESPONSE'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Error'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/models.Error'
+        "417":
+          description: Expectation Failed
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Reset User Pin
       tags:
       - User
   /user/sendotp:

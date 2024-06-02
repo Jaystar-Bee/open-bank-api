@@ -19,7 +19,7 @@ func UserRoutes(server *gin.Engine) {
 	userRoute.GET("/renew", middlewares.CheckAuthentication, handlers.RenewToken)
 	userRoute.PUT("/edit", middlewares.CheckAuthentication, middlewares.CheckAccountActivation, handlers.EditUser)
 	userRoute.PATCH("/reset-password", handlers.ResetUserPassword)
-	// userRoute.PATCH("/change-pin",nil)
+	userRoute.PATCH("/reset-pin", middlewares.CheckAuthentication, middlewares.CheckAccountActivation, handlers.ResetUserPin)
 	userRoute.PATCH("/change-pin", middlewares.CheckAuthentication, middlewares.CheckAccountActivation, handlers.ChangeUserPin)
 	userRoute.PATCH("/change-password", middlewares.CheckAuthentication, middlewares.CheckAccountActivation, handlers.ChangeUserPassword)
 	// userRoute.PATCH("/change-email", middlewares.CheckAuthentication, middlewares.CheckAccountActivation, nil)

@@ -827,7 +827,7 @@ func ResetUserPassword(context *gin.Context) {
 	hashPassword, err := utils.HashText(resetPasswordData.Password)
 	if err != nil {
 		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"message":    "Error occur while securing password",
+			"message":    "Error occured while securing password",
 			"dev_reason": err.Error(),
 		})
 		return
@@ -836,7 +836,7 @@ func ResetUserPassword(context *gin.Context) {
 	err = user.UpdatePassword(hashPassword)
 	if err != nil {
 		context.AbortWithStatusJSON(http.StatusExpectationFailed, gin.H{
-			"message":    "Error occur while saving password",
+			"message":    "Error occured while saving password",
 			"dev_reason": err.Error(),
 		})
 
@@ -844,6 +844,83 @@ func ResetUserPassword(context *gin.Context) {
 	}
 	context.JSON(http.StatusOK, gin.H{
 		"message": "Password reset successfully",
+	})
+
+}
+
+// ResetUserPin godoc
+//
+//	@Summary		Reset User Pin
+//	@Description	Reset user pin with otp
+//	@Tags			User
+//	@Security		ApiKeyAuth
+//	@Accept			json
+//	@Produce		json
+//	@Param			pin	body		models.RESET_PIN			true	"User Pin & Otp"
+//	@Success		200	{object}	models.HTTP_USER_RESPONSE	"Pin Reset successfully"
+//	@Failure		400	{object}	models.Error
+//	@Failure		404	{object}	models.Error
+//	@Failure		409	{object}	models.Error
+//	@Failure		417	{object}	models.Error
+//	@Failure		500	{object}	models.Error
+//	@Router			/user/reset-pin [patch]
+func ResetUserPin(context *gin.Context) {
+	var requestPinData models.RESET_PIN
+	email := context.GetString("email")
+	err := context.ShouldBindJSON(&requestPinData)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message":    "Unable to process request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	user, err := models.GetUserByEmail(email)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+			"message":    "User not found",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+	otp, err := db.RDB.Get(db.Ctx, email).Result()
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusConflict, gin.H{
+			"message":    "OTP expired",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	if otp != requestPinData.OTP {
+		context.AbortWithStatusJSON(http.StatusConflict, gin.H{
+			"message":    "Invalid OTP",
+			"dev_reason": "OTP does not match",
+		})
+		return
+	}
+
+	hashPin, err := utils.HashText(requestPinData.Pin)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message":    "Error occured while securing password",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	err = user.UpdatePin(hashPin)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message":    "Error occured while saving pin",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{
+		"message": "Pin reset successfully",
 	})
 
 }
