@@ -165,7 +165,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "User fetched successfully",
+                        "description": "Password updated successfully",
                         "schema": {
                             "$ref": "#/definitions/models.HTTP_USER_RESPONSE"
                         }
@@ -485,6 +485,70 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/reset-password": {
+            "patch": {
+                "description": "Reset user password with otp",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Reset User Password",
+                "parameters": [
+                    {
+                        "description": "User Password \u0026 Otp",
+                        "name": "password",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.RESET_PASSWORD"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Password Reset successfully",
+                        "schema": {
+                            "$ref": "#/definitions/models.HTTP_USER_RESPONSE"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "417": {
+                        "description": "Expectation Failed",
                         "schema": {
                             "$ref": "#/definitions/models.Error"
                         }
@@ -1514,6 +1578,25 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.RESET_PASSWORD": {
+            "type": "object",
+            "required": [
+                "email",
+                "otp",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "otp": {
+                    "type": "string"
+                },
+                "password": {
                     "type": "string"
                 }
             }

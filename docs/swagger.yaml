@@ -167,6 +167,19 @@ definitions:
     required:
     - email
     type: object
+  models.RESET_PASSWORD:
+    properties:
+      email:
+        type: string
+      otp:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - otp
+    - password
+    type: object
   models.TRANSACTION-models_USER_RESPONSE:
     properties:
       amount:
@@ -464,7 +477,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: User fetched successfully
+          description: Password updated successfully
           schema:
             $ref: '#/definitions/models.HTTP_USER_RESPONSE'
         "400":
@@ -681,6 +694,48 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Renew token
+      tags:
+      - User
+  /user/reset-password:
+    patch:
+      consumes:
+      - application/json
+      description: Reset user password with otp
+      parameters:
+      - description: User Password & Otp
+        in: body
+        name: password
+        required: true
+        schema:
+          $ref: '#/definitions/models.RESET_PASSWORD'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Password Reset successfully
+          schema:
+            $ref: '#/definitions/models.HTTP_USER_RESPONSE'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.Error'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/models.Error'
+        "417":
+          description: Expectation Failed
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Reset User Password
       tags:
       - User
   /user/sendotp:

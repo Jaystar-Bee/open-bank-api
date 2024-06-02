@@ -27,6 +27,12 @@ type CHANGE_PIN struct {
 	OldPin string `json:"old_pin" binding:"required"`
 	NewPin string `json:"new_pin" binding:"required"`
 }
+
+type RESET_PASSWORD struct {
+	OTP      string `json:"otp" binding:"required"`
+	Email    string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
 type CHANGE_PASSWORD struct {
 	OldPassword string `json:"old_password" binding:"required"`
 	NewPassword string `json:"new_password" binding:"required"`

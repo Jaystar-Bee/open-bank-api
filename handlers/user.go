@@ -715,7 +715,7 @@ func ChangeUserPin(context *gin.Context) {
 //	@Produce		json
 //	@Security		ApiKeyAuth
 //	@Param			password	body		models.CHANGE_PASSWORD		true	"User Password"
-//	@Success		200			{object}	models.HTTP_USER_RESPONSE	"User fetched successfully"
+//	@Success		200			{object}	models.HTTP_USER_RESPONSE	"Password updated successfully"
 //	@Failure		400			{object}	models.Error
 //	@Failure		404			{object}	models.Error
 //	@Failure		500			{object}	models.Error
@@ -770,4 +770,80 @@ func ChangeUserPassword(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{
 		"message": "Password updated successfully",
 	})
+}
+
+// ResetUserPassword godoc
+//
+//	@Summary		Reset User Password
+//	@Description	Reset user password with otp
+//	@Tags			User
+//	@Accept			json
+//	@Produce		json
+//	@Param			password	body		models.RESET_PASSWORD		true	"User Password & Otp"
+//	@Success		200			{object}	models.HTTP_USER_RESPONSE	"Password Reset successfully"
+//	@Failure		400			{object}	models.Error
+//	@Failure		404			{object}	models.Error
+//	@Failure		409			{object}	models.Error
+//	@Failure		417			{object}	models.Error
+//	@Failure		500			{object}	models.Error
+//	@Router			/user/reset-password [patch]
+func ResetUserPassword(context *gin.Context) {
+	var resetPasswordData models.RESET_PASSWORD
+
+	err := context.ShouldBindJSON(&resetPasswordData)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"message":    "Unable to process request",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+	user, err := models.GetUserByEmail(resetPasswordData.Email)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+			"message":    "The email is not registered",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	otp, err := db.RDB.Get(db.Ctx, resetPasswordData.Email).Result()
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusConflict, gin.H{
+			"message":    "OTP expired",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	if otp != resetPasswordData.OTP {
+		context.AbortWithStatusJSON(http.StatusConflict, gin.H{
+			"message":    "Invalid OTP",
+			"dev_reason": "OTP does not match",
+		})
+		return
+	}
+
+	hashPassword, err := utils.HashText(resetPasswordData.Password)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message":    "Error occur while securing password",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
+
+	err = user.UpdatePassword(hashPassword)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusExpectationFailed, gin.H{
+			"message":    "Error occur while saving password",
+			"dev_reason": err.Error(),
+		})
+
+		return
+	}
+	context.JSON(http.StatusOK, gin.H{
+		"message": "Password reset successfully",
+	})
+
 }
