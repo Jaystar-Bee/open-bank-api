@@ -3,8 +3,8 @@ package db
 func CreateTables() {
 
 	userTable := `
-		CREATE TABLE IF NOT EXISTS users (
-			id INTEGER PRIMARY KEY,
+		CREATE TABLE users (
+			id INTEGER AUTO PRIMARY KEY,
 			first_name TEXT NOT NULL,
 			last_name TEXT NOT NULL,
 			email TEXT UNIQUE NOT NULL,
@@ -26,7 +26,7 @@ func CreateTables() {
 	}
 
 	walletTable := `
-		CREATE TABLE IF NOT EXISTS wallets(
+		CREATE TABLE wallets(
 			id INTEGER PRIMARY KEY,
 			user_id INTEGER UNIQUE NOT NULL,
 			balance FLOAT NOT NULL,
@@ -43,7 +43,7 @@ func CreateTables() {
 	}
 
 	transaction_table := `
-		CREATE TABLE IF NOT EXISTS transactions(
+		CREATE TABLE transactions(
 			id INTEGER PRIMARY KEY,
 			sender INTEGER NOT NULL,
 			sender_wallet INTEGER NOT NULL,
@@ -68,7 +68,7 @@ func CreateTables() {
 	}
 
 	request_table := `
-		CREATE TABLE IF NOT EXISTS requests(
+		CREATE TABLE requests(
 			id INTEGER PRIMARY KEY,
 			requester INTEGER NOT NULL,
 			giver INTEGER NOT NULL,
