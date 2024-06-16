@@ -320,14 +320,14 @@ func CreateUser(context *gin.Context) {
 		})
 		return
 	}
-	err = sendOTP(user.FirstName+" "+user.LastName, user.Email)
-	if err != nil {
-		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"message":    "Unable to send OTP",
-			"dev_reason": err.Error(),
-		})
-		return
-	}
+	_ = sendOTP(user.FirstName+" "+user.LastName, user.Email)
+	// if err != nil {
+	// 	context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+	// 		"message":    "Unable to send OTP",
+	// 		"dev_reason": err.Error(),
+	// 	})
+	// 	return
+	// }
 
 	context.JSON(http.StatusOK, gin.H{
 		"message": "User created successfully",
