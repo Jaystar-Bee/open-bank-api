@@ -544,7 +544,7 @@ paths:
       tags:
       - User
   /user/edit:
-    post:
+    put:
       consumes:
       - application/json
       description: Edit User

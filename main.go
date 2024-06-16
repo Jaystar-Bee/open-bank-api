@@ -5,6 +5,7 @@ import (
 
 	"github.com/Jaystar-Bee/open-bank-api/db"
 	doc "github.com/Jaystar-Bee/open-bank-api/docs"
+	"github.com/Jaystar-Bee/open-bank-api/inits"
 	"github.com/Jaystar-Bee/open-bank-api/routes"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -32,6 +33,9 @@ func init() {
 	// 	panic(err)
 	// }
 	db.InitDatabase()
+
+	// Cloudinary
+	inits.InitCloudinary()
 }
 
 func main() {

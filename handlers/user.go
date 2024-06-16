@@ -346,7 +346,7 @@ func CreateUser(context *gin.Context) {
 //	@Failure		400		{object}	models.Error						"Unable to process request"
 //	@Failure		404		{object}	models.Error						"User not found"
 //	@Failure		500		{object}	models.Error						"Unable to process request"
-//	@Router			/user/edit [post]
+//	@Router			/user/edit [put]
 func EditUser(context *gin.Context) {
 	var editData models.USER_EDIT
 	userId := context.GetInt64("user")

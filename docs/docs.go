@@ -249,7 +249,7 @@ const docTemplate = `{
             }
         },
         "/user/edit": {
-            "post": {
+            "put": {
                 "description": "Edit User",
                 "consumes": [
                     "application/json"
