@@ -1,16 +1,18 @@
 package utils
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net"
-	"net/smtp"
 	"os"
+	"time"
 
 	"github.com/jordan-wright/email"
+	"github.com/mailersend/mailersend-go"
 )
 
-func SendEmail(to, subject, body string, status chan bool) {
+func SendEmail(to, subject, body string, to_name string, tags []string, status chan bool) {
 	e := email.NewEmail()
 	e.From = fmt.Sprintf("Open Bank <%s>", os.Getenv("EMAIL_ACCOUNT"))
 	e.To = []string{to}
@@ -18,10 +20,36 @@ func SendEmail(to, subject, body string, status chan bool) {
 	e.HTML = []byte(body)
 
 	var err error
-	if os.Getenv("ENV") == "development" {
+	if os.Getenv("ENV") == "develent" {
 		err = e.Send("localhost:1025", nil)
 	} else {
-		err = e.Send(fmt.Sprint(os.Getenv("MAIL_HOST"), ":587"), smtp.PlainAuth("", os.Getenv("MAIL_USERNAME"), os.Getenv("SMT_TOKEN"), os.Getenv("MAIL_HOST")))
+		ms := mailersend.NewMailersend(os.Getenv("MAILERSEND_API_KEY"))
+		ctx := context.Background()
+		ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+		defer cancel()
+
+		from := mailersend.From{
+			Name:  "Open Bank",
+			Email: os.Getenv("EMAIL_ACCOUNT"),
+		}
+		recipients := []mailersend.Recipient{
+			{
+				Name:  to_name,
+				Email: to,
+			},
+		}
+		tags := tags
+
+		message := ms.Email.NewMessage()
+
+		message.SetFrom(from)
+		message.SetRecipients(recipients)
+		message.SetSubject(subject)
+		message.SetHTML(body)
+		message.SetTags(tags)
+		message.SetInReplyTo("client-id")
+
+		_, err = ms.Email.Send(ctx, message)
 	}
 
 	if err != nil {
@@ -36,4 +64,5 @@ func SendEmail(to, subject, body string, status chan bool) {
 	}
 	status <- true
 	fmt.Println("Email sent successfully!")
+
 }

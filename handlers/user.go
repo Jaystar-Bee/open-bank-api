@@ -33,7 +33,7 @@ func sendOTP(name, email string) (int, error) {
 		return otp, err
 	}
 	messageStatus := make(chan bool)
-	go utils.SendEmail(email, "Verify your Account", body, messageStatus)
+	go utils.SendEmail(email, "Verify your Account", body, name, []string{"onboarding", "verify"}, messageStatus)
 	db.RDB.Set(db.Ctx, email, otp, time.Minute+time.Duration(expTime))
 	if <-messageStatus {
 		return otp, nil
