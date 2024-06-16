@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"log"
 	"time"
 
 	"github.com/Jaystar-Bee/open-bank-api/db"
@@ -56,12 +57,7 @@ type USER_RESPONSE struct {
 }
 
 func (user *USER) Save() error {
-	query := `INSERT INTO users (first_name, last_name, email, password, phone, transaction_pin, tag, is_verified, account_is_deactivated, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`
-
-	statement, err := db.MainDB.Prepare(query)
-	if err != nil {
-		return err
-	}
+	query := `INSERT INTO users (first_name, last_name, email, password, phone, transaction_pin, tag, is_verified, account_is_deactivated, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`
 
 	hashPassword, err := utils.HashText(user.Password)
 	if err != nil {
@@ -74,18 +70,15 @@ func (user *USER) Save() error {
 	}
 	user.TransactionPin = hashPin
 
-	defer statement.Close()
-	data, err := statement.Exec(user.FirstName, user.LastName, user.Email, user.Password, user.Phone, user.TransactionPin, user.Tag, false, false, utils.NowTime())
-	if err != nil {
-		return err
-	}
-	user.ID, err = data.LastInsertId()
+	err = db.MainDB.QueryRow(query, user.FirstName, user.LastName, user.Email, user.Password, user.Phone, user.TransactionPin, user.Tag, false, false, utils.NowTime()).Scan(&user.ID)
 	if err != nil {
 		return err
 	}
 	err = user.CreateWallet()
 	if err != nil {
+		log.Fatal(err)
 		return errors.New("error creating wallet")
+
 	}
 	return nil
 }

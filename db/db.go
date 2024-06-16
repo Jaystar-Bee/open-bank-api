@@ -20,7 +20,7 @@ func InitDatabase() {
 	if os.Getenv("ENV") == "production" {
 		initPostgres()
 	} else {
-		initSqlite()
+		initDev()
 	}
 	MainDB.SetMaxOpenConns(14)
 	MainDB.SetMaxIdleConns(7)
@@ -45,8 +45,9 @@ func initPostgres() {
 	MainDB = db
 }
 
-func initSqlite() {
-	db, err := sql.Open("sqlite3", "api.db")
+func initDev() {
+	connStr := fmt.Sprintf("user=%s password=%s host=%s dbname=%s sslmode=disable", os.Getenv("POSTGRES_USER"), os.Getenv("POSTGRES_PASSWORD"), os.Getenv("POSTGRES_HOST"), os.Getenv("POSTGRES_DB"))
+	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		panic(err)
 	}

@@ -3,7 +3,7 @@ package db
 func CreateTables() {
 
 	userTable := `
-		CREATE TABLE users (
+		CREATE TABLE IF NOT EXISTS users (
 			id SERIAL PRIMARY KEY,
 			first_name TEXT NOT NULL,
 			last_name TEXT NOT NULL,
@@ -26,7 +26,7 @@ func CreateTables() {
 	}
 
 	walletTable := `
-		CREATE TABLE wallets(
+		CREATE TABLE IF NOT EXISTS wallets(
 			id SERIAL PRIMARY KEY,
 			user_id INTEGER UNIQUE NOT NULL,
 			balance FLOAT NOT NULL,
@@ -43,7 +43,7 @@ func CreateTables() {
 	}
 
 	transaction_table := `
-		CREATE TABLE transactions(
+		CREATE TABLE IF NOT EXISTS transactions(
 			id SERIAL PRIMARY KEY,
 			sender INTEGER NOT NULL,
 			sender_wallet INTEGER NOT NULL,
@@ -68,7 +68,7 @@ func CreateTables() {
 	}
 
 	request_table := `
-		CREATE TABLE requests(
+		CREATE TABLE IF NOT EXISTS requests(
 			id SERIAL PRIMARY KEY,
 			requester INTEGER NOT NULL,
 			giver INTEGER NOT NULL,

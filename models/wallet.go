@@ -34,7 +34,7 @@ type ADD_TO_BALANCE_BODY struct {
 }
 
 func (user *USER) CreateWallet() error {
-	query := "INSERT INTO wallets (user_id, balance, created_at) VALUES (?, ?, ?)"
+	query := "INSERT INTO wallets (user_id, balance, created_at) VALUES ($1, $2, $3)"
 	statement, err := db.MainDB.Prepare(query)
 	if err != nil {
 		return err
@@ -47,7 +47,7 @@ func (user *USER) CreateWallet() error {
 
 func (user *USER_RESPONSE) GetWallet() (*WALLET, error) {
 	query := `
-	SELECT * FROM wallets WHERE user_id = ?
+	SELECT * FROM wallets WHERE user_id = $1
 	`
 	wallet := &WALLET{}
 	err := db.MainDB.QueryRow(query, user.ID).Scan(&wallet.ID, &wallet.UserID, &wallet.Balance, &wallet.CreatedAt, &wallet.UpdatedAt, &wallet.DeletedAt)
@@ -60,7 +60,7 @@ func (user *USER_RESPONSE) GetWallet() (*WALLET, error) {
 
 func AddToBalance(amount float64, userId int64) error {
 	query := `
-	UPDATE wallets SET balance = balance + ?, updated_at = ? WHERE user_id = ?
+	UPDATE wallets SET balance = balance + $1, updated_at = $2 WHERE user_id = $3
 	`
 
 	statement, err := db.MainDB.Prepare(query)
@@ -73,7 +73,7 @@ func AddToBalance(amount float64, userId int64) error {
 }
 
 func (wallet *WALLET) RemoveFromBalance(amount float64, transaction *TRANSACTION[int64]) (*TRANSACTION[int64], error) {
-	query := `UPDATE wallets SET balance = balance - ?, updated_at = ? WHERE id = ?`
+	query := `UPDATE wallets SET balance = balance - $1, updated_at = $2 WHERE id = $3`
 
 	statement, err := db.MainDB.Prepare(query)
 	if err != nil {
