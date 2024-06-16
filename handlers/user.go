@@ -15,7 +15,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func sendOTP(name, email string) error {
+func sendOTP(name, email string) (int, error) {
 	otp := utils.GenerateUniqueNumbers(1000, 9999)
 	date := time.Now().Format(time.RFC822)
 	expTime := 10
@@ -30,15 +30,15 @@ func sendOTP(name, email string) error {
 
 	body, err := utils.ParseTemplate("emails/templates/otp.html", template_data)
 	if err != nil {
-		return err
+		return otp, err
 	}
 	messageStatus := make(chan bool)
 	go utils.SendEmail(email, "Verify your Account", body, messageStatus)
 	db.RDB.Set(db.Ctx, email, otp, time.Minute+time.Duration(expTime))
 	if <-messageStatus {
-		return nil
+		return otp, nil
 	} else {
-		return errors.New("unable to send email")
+		return otp, errors.New("unable to send email")
 	}
 }
 
@@ -235,20 +235,22 @@ func SendOTP(context *gin.Context) {
 		return
 	}
 	user, _ := models.GetUserByEmail(userOTP.Email)
+	var otp int
 	if user.ID > 0 {
-		err = sendOTP(fmt.Sprint(user.FirstName, " ", user.LastName), userOTP.Email)
+		otp, _ = sendOTP(fmt.Sprint(user.FirstName, " ", user.LastName), userOTP.Email)
 	} else {
-		err = sendOTP(userOTP.Name, userOTP.Email)
+		otp, _ = sendOTP(userOTP.Name, userOTP.Email)
 	}
-	if err != nil {
-		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"message":    "Unable to send OTP",
-			"dev_reason": err.Error(),
-		})
-		return
-	}
+	// if err != nil {
+	// 	context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+	// 		"message":    "Unable to send OTP",
+	// 		"dev_reason": err.Error(),
+	// 	})
+	// 	return
+	// }
 	context.JSON(http.StatusOK, gin.H{
 		"message": "OTP sent successfully",
+		"data":    otp,
 	})
 }
 
@@ -320,7 +322,7 @@ func CreateUser(context *gin.Context) {
 		})
 		return
 	}
-	_ = sendOTP(user.FirstName+" "+user.LastName, user.Email)
+	otp, _ := sendOTP(user.FirstName+" "+user.LastName, user.Email)
 	// if err != nil {
 	// 	context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 	// 		"message":    "Unable to send OTP",
@@ -331,6 +333,7 @@ func CreateUser(context *gin.Context) {
 
 	context.JSON(http.StatusOK, gin.H{
 		"message": "User created successfully",
+		"data":    otp,
 	})
 }
 
