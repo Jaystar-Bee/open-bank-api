@@ -456,11 +456,6 @@ paths:
         name: file
         required: true
         type: file
-      - description: Upload File
-        in: formData
-        name: id
-        required: true
-        type: integer
       produces:
       - application/json
       responses:
@@ -476,6 +471,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
       summary: Upload File
       tags:
       - Upload
