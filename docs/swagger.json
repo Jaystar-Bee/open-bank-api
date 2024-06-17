@@ -128,6 +128,11 @@
         },
         "/upload": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Upload File",
                 "consumes": [
                     "multipart/form-data"
@@ -144,13 +149,6 @@
                         "type": "file",
                         "description": "Upload File",
                         "name": "file",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Upload File",
-                        "name": "id",
                         "in": "formData",
                         "required": true
                     }

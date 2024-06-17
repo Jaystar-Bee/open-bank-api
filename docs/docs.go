@@ -136,6 +136,11 @@ const docTemplate = `{
         },
         "/upload": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Upload File",
                 "consumes": [
                     "multipart/form-data"
@@ -152,13 +157,6 @@ const docTemplate = `{
                         "type": "file",
                         "description": "Upload File",
                         "name": "file",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Upload File",
-                        "name": "id",
                         "in": "formData",
                         "required": true
                     }
