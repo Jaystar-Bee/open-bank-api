@@ -20,7 +20,7 @@ func SendEmail(to, subject, body string, to_name string, tags []string, status c
 	e.HTML = []byte(body)
 
 	var err error
-	if os.Getenv("ENV") == "develent" {
+	if os.Getenv("ENV") == "development" {
 		err = e.Send("localhost:1025", nil)
 	} else {
 		ms := mailersend.NewMailersend(os.Getenv("MAILERSEND_API_KEY"))
@@ -38,7 +38,6 @@ func SendEmail(to, subject, body string, to_name string, tags []string, status c
 				Email: to,
 			},
 		}
-		tags := tags
 
 		message := ms.Email.NewMessage()
 

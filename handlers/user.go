@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/Jaystar-Bee/open-bank-api/db"
+	"github.com/Jaystar-Bee/open-bank-api/emails"
 	"github.com/Jaystar-Bee/open-bank-api/jwt"
 	"github.com/Jaystar-Bee/open-bank-api/models"
 	"github.com/Jaystar-Bee/open-bank-api/utils"
@@ -178,6 +179,7 @@ func VerifyAccount(context *gin.Context) {
 
 	// VERIFY ACCOUNT AND UPDATE ACCOUNT
 	user.IsVerified = true
+	_ = emails.SendWelcomeEmail(user.Email, fmt.Sprintf("%s %s", user.FirstName, user.LastName))
 	err = user.UpdateUser()
 	if err != nil {
 		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
