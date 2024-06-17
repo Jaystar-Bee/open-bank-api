@@ -48,6 +48,13 @@ definitions:
       message:
         type: string
     type: object
+  models.HTTP_FILE_RESPONSE:
+    properties:
+      data:
+        type: string
+      message:
+        type: string
+    type: object
   models.HTTP_LOGIN_RESPONSE:
     properties:
       data:
@@ -438,6 +445,40 @@ paths:
       summary: Get transaction by ID
       tags:
       - Transactions
+  /upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload File
+      parameters:
+      - description: Upload File
+        in: formData
+        name: file
+        required: true
+        type: file
+      - description: Upload File
+        in: formData
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.HTTP_FILE_RESPONSE'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Upload File
+      tags:
+      - Upload
   /user/{user_id}:
     get:
       consumes:

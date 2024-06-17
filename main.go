@@ -28,10 +28,7 @@ import (
 var app *gin.Engine
 
 func init() {
-	godotenv.Load()
-	// if err != nil {
-	// 	panic(err)
-	// }
+	_ = godotenv.Load()
 	db.InitDatabase()
 
 	// Cloudinary
@@ -50,6 +47,7 @@ func main() {
 	routes.UserRoutes(server)
 	routes.WalletRoutes(server)
 	routes.TransactionRoutes(server)
+	routes.UploadRoutes(server)
 
 	err := server.Run()
 	if err != nil {
