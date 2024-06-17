@@ -53,3 +53,8 @@ type HTTP_REQUEST_RESPONSE struct {
 	Data    HTTP_REQUEST `json:"data"`
 	Message string       `json:"message"`
 }
+
+type HTTP_FILE_RESPONSE struct {
+	Data    string `json:"data"`
+	Message string `json:"message"`
+}

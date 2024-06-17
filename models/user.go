@@ -2,7 +2,6 @@ package models
 
 import (
 	"errors"
-	"log"
 	"time"
 
 	"github.com/Jaystar-Bee/open-bank-api/db"
@@ -76,7 +75,6 @@ func (user *USER) Save() error {
 	}
 	err = user.CreateWallet()
 	if err != nil {
-		log.Fatal(err)
 		return errors.New("error creating wallet")
 
 	}

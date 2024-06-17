@@ -16,7 +16,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func sendOTP(name, email string) (int, error) {
+func sendOTP(name, email string) error {
 	otp := utils.GenerateUniqueNumbers(1000, 9999)
 	date := time.Now().Format(time.RFC822)
 	expTime := 10
@@ -31,15 +31,15 @@ func sendOTP(name, email string) (int, error) {
 
 	body, err := utils.ParseTemplate("emails/templates/otp.html", template_data)
 	if err != nil {
-		return otp, err
+		return err
 	}
 	messageStatus := make(chan bool)
 	go utils.SendEmail(email, "Verify your Account", body, name, []string{"onboarding", "verify"}, messageStatus)
 	db.RDB.Set(db.Ctx, email, otp, time.Minute+time.Duration(expTime))
 	if <-messageStatus {
-		return otp, nil
+		return nil
 	} else {
-		return otp, errors.New("unable to send email")
+		return errors.New("unable to send email")
 	}
 }
 
@@ -237,22 +237,20 @@ func SendOTP(context *gin.Context) {
 		return
 	}
 	user, _ := models.GetUserByEmail(userOTP.Email)
-	var otp int
 	if user.ID > 0 {
-		otp, _ = sendOTP(fmt.Sprint(user.FirstName, " ", user.LastName), userOTP.Email)
+		err = sendOTP(fmt.Sprint(user.FirstName, " ", user.LastName), userOTP.Email)
 	} else {
-		otp, _ = sendOTP(userOTP.Name, userOTP.Email)
+		err = sendOTP(userOTP.Name, userOTP.Email)
 	}
-	// if err != nil {
-	// 	context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-	// 		"message":    "Unable to send OTP",
-	// 		"dev_reason": err.Error(),
-	// 	})
-	// 	return
-	// }
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message":    "Unable to send OTP",
+			"dev_reason": err.Error(),
+		})
+		return
+	}
 	context.JSON(http.StatusOK, gin.H{
 		"message": "OTP sent successfully",
-		"data":    otp,
 	})
 }
 
@@ -324,18 +322,10 @@ func CreateUser(context *gin.Context) {
 		})
 		return
 	}
-	otp, _ := sendOTP(user.FirstName+" "+user.LastName, user.Email)
-	// if err != nil {
-	// 	context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-	// 		"message":    "Unable to send OTP",
-	// 		"dev_reason": err.Error(),
-	// 	})
-	// 	return
-	// }
+	_ = sendOTP(user.FirstName+" "+user.LastName, user.Email)
 
 	context.JSON(http.StatusOK, gin.H{
 		"message": "User created successfully",
-		"data":    otp,
 	})
 }
 

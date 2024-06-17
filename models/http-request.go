@@ -50,3 +50,8 @@ type HTTP_REQUEST struct {
 	Status    string  `json:"status"`
 	Remarks   string  `json:"remarks"`
 }
+
+type HTTP_FILE_REQUEST struct {
+	File string `json:"file" binding:"required"`
+	Id   string `json:"id" binding:"required"`
+}
