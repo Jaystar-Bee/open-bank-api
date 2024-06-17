@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/Jaystar-Bee/open-bank-api/db"
+	"github.com/Jaystar-Bee/open-bank-api/emails"
 	"github.com/Jaystar-Bee/open-bank-api/jwt"
 	"github.com/Jaystar-Bee/open-bank-api/models"
 	"github.com/Jaystar-Bee/open-bank-api/utils"
@@ -33,7 +34,7 @@ func sendOTP(name, email string) (int, error) {
 		return otp, err
 	}
 	messageStatus := make(chan bool)
-	go utils.SendEmail(email, "Verify your Account", body, messageStatus)
+	go utils.SendEmail(email, "Verify your Account", body, name, []string{"onboarding", "verify"}, messageStatus)
 	db.RDB.Set(db.Ctx, email, otp, time.Minute+time.Duration(expTime))
 	if <-messageStatus {
 		return otp, nil
@@ -178,6 +179,7 @@ func VerifyAccount(context *gin.Context) {
 
 	// VERIFY ACCOUNT AND UPDATE ACCOUNT
 	user.IsVerified = true
+	_ = emails.SendWelcomeEmail(user.Email, fmt.Sprintf("%s %s", user.FirstName, user.LastName))
 	err = user.UpdateUser()
 	if err != nil {
 		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
