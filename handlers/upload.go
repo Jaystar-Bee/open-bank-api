@@ -55,7 +55,7 @@ func UploadFile(context *gin.Context) {
 	}
 	context.JSON(http.StatusOK, gin.H{
 		"message": "File uploaded successfully",
-		"data":    res.SecureURL,
+		"data":    res,
 	})
 
 }
