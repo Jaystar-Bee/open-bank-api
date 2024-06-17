@@ -43,7 +43,7 @@ func UploadFile(context *gin.Context) {
 		Overwrite:      api.Bool(true),
 		UseFilename:    api.Bool(true),
 		UniqueFilename: api.Bool(false),
-		AssetFolder:    fmt.Sprint(id),
+		Folder:         fmt.Sprint(id),
 	})
 
 	if err != nil {
