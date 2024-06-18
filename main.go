@@ -39,7 +39,10 @@ func main() {
 	server := gin.Default()
 	// DOCS
 
-	server.Use(cors.Default())
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+	config.AllowHeaders = []string{"Authorization", "Content-Type", "X-Requested-With", "Origin", "Accept"}
+	server.Use(cors.New(config))
 	doc.SwaggerInfo.BasePath = "/"
 	server.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
