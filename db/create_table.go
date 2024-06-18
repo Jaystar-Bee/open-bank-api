@@ -30,9 +30,9 @@ func CreateTables() {
 			id SERIAL PRIMARY KEY,
 			user_id INTEGER UNIQUE NOT NULL,
 			balance FLOAT NOT NULL,
-			created_at TEXT NOT NULL,
-			updated_at TEXT,
-			deleted_at TEXT,
+			created_at TIMESTAMP NOT NULL,
+			updated_at TIMESTAMP,
+			deleted_at TIMESTAMP,
 			FOREIGN KEY (user_id) REFERENCES users(id)
 		)
 	`
@@ -52,9 +52,9 @@ func CreateTables() {
 			amount FLOAT NOT NULL,
 			status TEXT NOT NULL,
 			remarks TEXT,
-			created_at TEXT NOT NULL,
-			updated_at TEXT,
-			deleted_at TEXT,
+			created_at TIMESTAMP NOT NULL,
+			updated_at TIMESTAMP,
+			deleted_at TIMESTAMP,
 			FOREIGN KEY (sender) REFERENCES users(id),
 			FOREIGN KEY (receiver) REFERENCES users(id),
 			FOREIGN KEY (sender_wallet) REFERENCES wallets(id),
@@ -75,9 +75,9 @@ func CreateTables() {
 			amount FLOAT NOT NULL,
 			status TEXT NOT NULL,
 			remarks TEXT,
-			created_at TEXT NOT NULL,
-			updated_at TEXT,
-			deleted_at TEXT,
+			created_at TIMESTAMP NOT NULL,
+			updated_at TIMESTAMP,
+			deleted_at TIMESTAMP,
 			FOREIGN KEY (requester) REFERENCES users(id),
 			FOREIGN KEY (giver) REFERENCES users(id)
 			)
