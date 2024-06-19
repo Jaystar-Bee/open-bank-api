@@ -735,7 +735,7 @@ func ChangeUserPassword(context *gin.Context) {
 		})
 		return
 	}
-	err = user.ConfirmPin(passwordData.OldPassword)
+	err = user.ConfirmPassword(passwordData.OldPassword)
 	if err != nil {
 		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"message":    "Invalid old password",
