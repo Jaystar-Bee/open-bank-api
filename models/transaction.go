@@ -29,36 +29,36 @@ type UserTypes interface {
 }
 
 type TRANSACTION[T int64 | *USER_RESPONSE | *USER] struct {
-	ID              int64   `json:"id"`
-	Sender          T       `json:"sender" binding:"required"`
-	Sender_Wallet   int64   `json:"sender_wallet" binding:"required"`
-	Receiver        T       `json:"receiver" binding:"required"`
-	Receiver_Wallet int64   `json:"receiver_wallet" binding:"required"`
-	Amount          float64 `json:"amount" binding:"required"`
-	Status          string  `json:"status" binding:"required"`
+	ID              int64     `json:"id"`
+	Sender          T         `json:"sender" binding:"required"`
+	Sender_Wallet   int64     `json:"sender_wallet" binding:"required"`
+	Receiver        T         `json:"receiver" binding:"required"`
+	Receiver_Wallet int64     `json:"receiver_wallet" binding:"required"`
+	Amount          float64   `json:"amount" binding:"required"`
+	Status          string    `json:"status" binding:"required"`
+	Remarks         string    `json:"remarks"`
+	CreatedAt       time.Time `json:"created_at"`
+	UpdatedAt       time.Time `json:"updated_at"`
+	DeletedAt       time.Time `json:"deleted_at"`
+	Channel         string    `json:"channel"`
 	// Channel         string    `json:"channel" binding:"required"` // TODO: Change to thi one. Once done, this is required
-	Channel   string    `json:"channel"`
-	Remarks   string    `json:"remarks"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	DeletedAt time.Time `json:"deleted_at"`
 }
 
 type TRANSACTION_RESPONSE[T int64 | *USER_RESPONSE] struct {
-	ID              int64   `json:"id"`
-	Sender          T       `json:"sender" binding:"required"`
-	Sender_Wallet   int64   `json:"sender_wallet" binding:"required"`
-	Receiver        T       `json:"receiver" binding:"required"`
-	Receiver_Wallet int64   `json:"receiver_wallet" binding:"required"`
-	Amount          float64 `json:"amount" binding:"required"`
-	Status          string  `json:"status" binding:"required"`
+	ID              int64      `json:"id"`
+	Sender          T          `json:"sender" binding:"required"`
+	Sender_Wallet   int64      `json:"sender_wallet" binding:"required"`
+	Receiver        T          `json:"receiver" binding:"required"`
+	Receiver_Wallet int64      `json:"receiver_wallet" binding:"required"`
+	Amount          float64    `json:"amount" binding:"required"`
+	Status          string     `json:"status" binding:"required"`
+	Remarks         string     `json:"remarks"`
+	Type            string     `json:"type"`
+	CreatedAt       *time.Time `json:"created_at"`
+	UpdatedAt       *time.Time `json:"updated_at"`
+	DeletedAt       *time.Time `json:"deleted_at"`
+	Channel         string     `json:"channel"`
 	// Channel         string    `json:"channel" binding:"required"` // TODO: Change to thi one. Once done, this is required
-	Channel   string     `json:"channel"`
-	Remarks   string     `json:"remarks"`
-	Type      string     `json:"type"`
-	CreatedAt *time.Time `json:"created_at"`
-	UpdatedAt *time.Time `json:"updated_at"`
-	DeletedAt *time.Time `json:"deleted_at"`
 }
 
 func (transaction *TRANSACTION[int64]) Save() (*TRANSACTION[int64], error) {
