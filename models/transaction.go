@@ -1,7 +1,6 @@
 package models
 
 import (
-	"database/sql"
 	"time"
 
 	"github.com/Jaystar-Bee/open-bank-api/db"
@@ -9,9 +8,10 @@ import (
 )
 
 const (
-	Transaction_send    = "DEBIT"
-	Transaction_receive = "CREDIT"
-	Transaction_return  = "REVERTED"
+	Transaction_send      = "DEBIT"
+	Transaction_receive   = "CREDIT"
+	Transaction_return    = "REVERTED"
+	Transaction_cancelled = "CANCELLED"
 )
 const (
 	Transaction_pending   = "PENDING"
@@ -20,51 +20,51 @@ const (
 	Transaction_completed = "COMPLETED"
 )
 
+const (
+	Transaction_Channel_Request = "REQUEST"
+	Transaction_Channel_Wallet  = "WALLET"
+)
+
 type UserTypes interface {
 }
 
 type TRANSACTION[T int64 | *USER_RESPONSE | *USER] struct {
-	ID              int64     `json:"id"`
-	Sender          T         `json:"sender" binding:"required"`
-	Sender_Wallet   int64     `json:"sender_wallet" binding:"required"`
-	Receiver        T         `json:"receiver" binding:"required"`
-	Receiver_Wallet int64     `json:"receiver_wallet" binding:"required"`
-	Amount          float64   `json:"amount" binding:"required"`
-	Status          string    `json:"status" binding:"required"`
-	Remarks         string    `json:"remarks"`
-	CreatedAt       time.Time `json:"created_at"`
-	UpdatedAt       time.Time `json:"updated_at"`
-	DeletedAt       time.Time `json:"deleted_at"`
+	ID              int64   `json:"id"`
+	Sender          T       `json:"sender" binding:"required"`
+	Sender_Wallet   int64   `json:"sender_wallet" binding:"required"`
+	Receiver        T       `json:"receiver" binding:"required"`
+	Receiver_Wallet int64   `json:"receiver_wallet" binding:"required"`
+	Amount          float64 `json:"amount" binding:"required"`
+	Status          string  `json:"status" binding:"required"`
+	// Channel         string    `json:"channel" binding:"required"` // TODO: Change to thi one. Once done, this is required
+	Channel   string    `json:"channel"`
+	Remarks   string    `json:"remarks"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	DeletedAt time.Time `json:"deleted_at"`
 }
 
 type TRANSACTION_RESPONSE[T int64 | *USER_RESPONSE] struct {
-	ID              int64          `json:"id"`
-	Sender          T              `json:"sender" binding:"required"`
-	Sender_Wallet   int64          `json:"sender_wallet" binding:"required"`
-	Receiver        T              `json:"receiver" binding:"required"`
-	Receiver_Wallet int64          `json:"receiver_wallet" binding:"required"`
-	Amount          float64        `json:"amount" binding:"required"`
-	Status          string         `json:"status" binding:"required"`
-	Remarks         sql.NullString `json:"remarks"`
-	Type            string         `json:"type"`
-	CreatedAt       sql.NullString `json:"created_at"`
-	UpdatedAt       sql.NullString `json:"updated_at"`
-	DeletedAt       sql.NullString `json:"deleted_at"`
+	ID              int64   `json:"id"`
+	Sender          T       `json:"sender" binding:"required"`
+	Sender_Wallet   int64   `json:"sender_wallet" binding:"required"`
+	Receiver        T       `json:"receiver" binding:"required"`
+	Receiver_Wallet int64   `json:"receiver_wallet" binding:"required"`
+	Amount          float64 `json:"amount" binding:"required"`
+	Status          string  `json:"status" binding:"required"`
+	// Channel         string    `json:"channel" binding:"required"` // TODO: Change to thi one. Once done, this is required
+	Channel   string     `json:"channel"`
+	Remarks   string     `json:"remarks"`
+	Type      string     `json:"type"`
+	CreatedAt *time.Time `json:"created_at"`
+	UpdatedAt *time.Time `json:"updated_at"`
+	DeletedAt *time.Time `json:"deleted_at"`
 }
 
 func (transaction *TRANSACTION[int64]) Save() (*TRANSACTION[int64], error) {
-	query := `INSERT INTO transactions (sender, sender_wallet, receiver, receiver_wallet, amount, status, created_at, updated_at, deleted_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
+	query := `INSERT INTO transactions (sender, sender_wallet, receiver, receiver_wallet, amount, status, channel, remarks, created_at, updated_at, deleted_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id`
 
-	statement, err := db.MainDB.Prepare(query)
-	if err != nil {
-		return transaction, err
-	}
-	defer statement.Close()
-	data, err := statement.Exec(transaction.Sender, transaction.Sender_Wallet, transaction.Receiver, transaction.Receiver_Wallet, transaction.Amount, transaction.Status, utils.NowTime(), nil, nil)
-	if err != nil {
-		return transaction, err
-	}
-	transaction.ID, err = data.LastInsertId()
+	err := db.MainDB.QueryRow(query, transaction.Sender, transaction.Sender_Wallet, transaction.Receiver, transaction.Receiver_Wallet, transaction.Amount, transaction.Status, transaction.Channel, transaction.Remarks, utils.NowTime(), nil, nil).Scan(&transaction.ID)
 	return transaction, err
 }
 
@@ -109,7 +109,7 @@ func (user *USER_RESPONSE) GetTransactions(per_page, page_number float64) ([]TRA
 		var transaction TRANSACTION_RESPONSE[*USER_RESPONSE]
 		var sender int64
 		var receiver int64
-		err := rows.Scan(&transaction.ID, &sender, &transaction.Sender_Wallet, &receiver, &transaction.Receiver_Wallet, &transaction.Amount, &transaction.Status, &transaction.Remarks, &transaction.CreatedAt, &transaction.UpdatedAt, &transaction.DeletedAt)
+		err := rows.Scan(&transaction.ID, &sender, &transaction.Sender_Wallet, &receiver, &transaction.Receiver_Wallet, &transaction.Amount, &transaction.Status, &transaction.Remarks, &transaction.CreatedAt, &transaction.UpdatedAt, &transaction.DeletedAt, &transaction.Channel)
 		if err != nil {
 			return nil, 0, err
 		}
@@ -126,7 +126,7 @@ func GetTransactionByID(id int64) (*TRANSACTION_RESPONSE[*USER_RESPONSE], error)
 	var transaction TRANSACTION_RESPONSE[*USER_RESPONSE]
 	var sender int64
 	var receiver int64
-	err := db.MainDB.QueryRow(query, id).Scan(&transaction.ID, &sender, &transaction.Sender_Wallet, &receiver, &transaction.Receiver_Wallet, &transaction.Amount, &transaction.Status, &transaction.Remarks, &transaction.CreatedAt, &transaction.UpdatedAt, &transaction.DeletedAt)
+	err := db.MainDB.QueryRow(query, id).Scan(&transaction.ID, &sender, &transaction.Sender_Wallet, &receiver, &transaction.Receiver_Wallet, &transaction.Amount, &transaction.Status, &transaction.Remarks, &transaction.CreatedAt, &transaction.UpdatedAt, &transaction.DeletedAt, &transaction.Channel)
 	if err != nil {
 		return nil, err
 	}

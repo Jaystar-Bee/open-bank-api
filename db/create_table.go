@@ -43,7 +43,7 @@ func CreateTables() {
 	}
 
 	transaction_table := `
-		CREATE TABLE IF NOT EXISTS transactions(
+			CREATE TABLE IF NOT EXISTS transactions(
 			id SERIAL PRIMARY KEY,
 			sender INTEGER NOT NULL,
 			sender_wallet INTEGER NOT NULL,
@@ -51,6 +51,7 @@ func CreateTables() {
 			receiver_wallet INTEGER NOT NULL,
 			amount FLOAT NOT NULL,
 			status TEXT NOT NULL,
+			channel TEXT NOT NULL,
 			remarks TEXT,
 			created_at TIMESTAMP NOT NULL,
 			updated_at TIMESTAMP,
@@ -63,6 +64,16 @@ func CreateTables() {
 	`
 
 	_, err = MainDB.Exec(transaction_table)
+	if err != nil {
+		panic(err)
+	}
+
+	// Add channel to transaction table
+	alter_transaction_table := `
+		ALTER TABLE transactions
+		ADD COLUMN IF NOT EXISTS channel TEXT NOT NULL
+	`
+	_, err = MainDB.Exec(alter_transaction_table)
 	if err != nil {
 		panic(err)
 	}

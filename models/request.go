@@ -1,7 +1,7 @@
 package models
 
 import (
-	"database/sql"
+	"time"
 
 	"github.com/Jaystar-Bee/open-bank-api/db"
 	"github.com/Jaystar-Bee/open-bank-api/utils"
@@ -13,29 +13,20 @@ const (
 )
 
 type REQUEST struct {
-	ID        int64          `json:"id"`
-	Requester int64          `json:"requester"`
-	Giver     int64          `json:"giver" binding:"required"`
-	Amount    float64        `json:"amount" binding:"required"`
-	Status    string         `json:"status"`
-	Remarks   string         `json:"remarks"`
-	CreatedAt sql.NullString `json:"created_at"`
-	UpdatedAt sql.NullString `json:"updated_at"`
-	DeletedAt sql.NullString `json:"deleted_at"`
+	ID        int64      `json:"id"`
+	Requester int64      `json:"requester"`
+	Giver     int64      `json:"giver" binding:"required"`
+	Amount    float64    `json:"amount" binding:"required"`
+	Status    string     `json:"status"`
+	Remarks   string     `json:"remarks"`
+	CreatedAt *time.Time `json:"created_at"`
+	UpdatedAt *time.Time `json:"updated_at"`
+	DeletedAt *time.Time `json:"deleted_at"`
 }
 
 func (request *REQUEST) Save() (*REQUEST, error) {
-	query := `INSERT INTO requests (requester, giver, amount, status, remarks, created_at) VALUES ($1, $2, $3, $4, $5, $6)`
-	stmt, err := db.MainDB.Prepare(query)
-	if err != nil {
-		return nil, err
-	}
-	defer stmt.Close()
-	data, err := stmt.Exec(request.Requester, request.Giver, request.Amount, request.Status, request.Remarks, utils.NowTime())
-	if err != nil {
-		return nil, err
-	}
-	request.ID, err = data.LastInsertId()
+	query := `INSERT INTO requests (requester, giver, amount, status, remarks, created_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`
+	err := db.MainDB.QueryRow(query, request.Requester, request.Giver, request.Amount, request.Status, request.Remarks, utils.NowTime()).Scan(&request.ID)
 	return request, err
 }
 

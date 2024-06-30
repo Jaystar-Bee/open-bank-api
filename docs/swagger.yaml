@@ -201,6 +201,10 @@ definitions:
     properties:
       amount:
         type: number
+      channel:
+        description: 'Channel         string    `json:"channel" binding:"required"`
+          // TODO: Change to thi one. Once done, this is required'
+        type: string
       created_at:
         type: string
       deleted_at:
@@ -1169,7 +1173,7 @@ paths:
       summary: Delete a request
       tags:
       - Wallet
-  /wallet/requests/{id}/accept:
+  /wallet/requests/{id}/confirm:
     post:
       consumes:
       - application/json

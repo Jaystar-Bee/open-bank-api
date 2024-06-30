@@ -1255,7 +1255,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/wallet/requests/{id}/accept": {
+        "/wallet/requests/{id}/confirm": {
             "post": {
                 "security": [
                     {
@@ -1758,6 +1758,10 @@ const docTemplate = `{
             "properties": {
                 "amount": {
                     "type": "number"
+                },
+                "channel": {
+                    "description": "Channel         string    ` + "`" + `json:\"channel\" binding:\"required\"` + "`" + ` // TODO: Change to thi one. Once done, this is required",
+                    "type": "string"
                 },
                 "created_at": {
                     "type": "string"
