@@ -12,17 +12,17 @@ import (
 )
 
 // UploadFile godoc
-// @Summary Upload File
-// @Description Upload File
-// @Tags Upload
-// @Accept multipart/form-data
-// @Security ApiKeyAuth
-// @Param file formData file true "Upload File"
-// @Produce json
-// @Success 200 {object} models.HTTP_FILE_RESPONSE
-// @Failure 400 {object} models.Error
-// @Failure 500 {object} models.Error
-// @Router /upload [post]
+//	@Summary		Upload File
+//	@Description	Upload File
+//	@Tags			Upload
+//	@Accept			multipart/form-data
+//	@Security		ApiKeyAuth
+//	@Param			file	formData	file	true	"Upload File"
+//	@Produce		json
+//	@Success		200	{object}	models.HTTP_FILE_RESPONSE
+//	@Failure		400	{object}	models.Error
+//	@Failure		500	{object}	models.Error
+//	@Router			/upload [post]
 func UploadFile(context *gin.Context) {
 	file, err := context.FormFile("file")
 	if err != nil {

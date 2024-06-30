@@ -147,6 +147,7 @@ func SendToUser(context *gin.Context) {
 		Receiver_Wallet: receiver_wallet.ID,
 		Amount:          body.Amount,
 		Status:          models.Transaction_pending,
+		Channel:         models.Transaction_Channel_Wallet,
 		Remarks:         body.Remarks,
 		CreatedAt:       time.Now(),
 	}
@@ -241,6 +242,7 @@ func Deposit(context *gin.Context) {
 		Receiver:        user.ID,
 		Receiver_Wallet: wallet.ID,
 		Status:          models.Transaction_pending,
+		Channel:         models.Transaction_Channel_Wallet,
 		Remarks:         "Deposit",
 		CreatedAt:       time.Now(),
 	}
@@ -440,7 +442,6 @@ func GetUserRequests(context *gin.Context) {
 		})
 		return
 	}
-
 	var requests []*models.REQUEST
 	if requestType == models.Request_Giver {
 		requests, err = models.GetRequestsToPay(user_id)
@@ -561,6 +562,7 @@ func RejectRequest(context *gin.Context) {
 		Receiver:        request.Requester,
 		Receiver_Wallet: requester_wallet.ID,
 		Status:          models.Transaction_pending,
+		Channel:         models.Transaction_Channel_Request,
 		Remarks:         request.Remarks,
 		CreatedAt:       time.Now(),
 	}
@@ -584,7 +586,7 @@ func RejectRequest(context *gin.Context) {
 		return
 	}
 	transaction.Status = models.Transaction_rejected
-	transaction.Update()
+	_, _ = transaction.Update()
 
 	context.JSON(http.StatusOK, gin.H{
 		"message": "Request rejected successfully",
@@ -607,7 +609,7 @@ func RejectRequest(context *gin.Context) {
 //	@Failure		401	{object}	models.Error
 //	@Failure		404	{object}	models.Error
 //	@Failure		500	{object}	models.Error
-//	@Router			/wallet/requests/{id}/accept [post]
+//	@Router			/wallet/requests/{id}/confirm [post]
 func ConfirmRequest(context *gin.Context) {
 
 	// PARSE PARAMS
@@ -693,6 +695,7 @@ func ConfirmRequest(context *gin.Context) {
 		Receiver:        request.Requester,
 		Receiver_Wallet: requester_wallet.ID,
 		Status:          models.Transaction_pending,
+		Channel:         models.Transaction_Channel_Request,
 		Remarks:         request.Remarks,
 		CreatedAt:       time.Now(),
 	}
