@@ -75,13 +75,7 @@ definitions:
         type: number
       giver:
         type: integer
-      id:
-        type: integer
       remarks:
-        type: string
-      requester:
-        type: integer
-      status:
         type: string
     required:
     - amount
@@ -90,9 +84,35 @@ definitions:
   models.HTTP_REQUEST_RESPONSE:
     properties:
       data:
-        $ref: '#/definitions/models.HTTP_REQUEST'
+        items:
+          $ref: '#/definitions/models.HTTP_REQUEST_RESPONSE_ITEM'
+        type: array
       message:
         type: string
+    type: object
+  models.HTTP_REQUEST_RESPONSE_ITEM:
+    properties:
+      amount:
+        type: number
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      giver:
+        $ref: '#/definitions/models.USER'
+      id:
+        type: integer
+      remarks:
+        type: string
+      requester:
+        $ref: '#/definitions/models.USER'
+      status:
+        type: string
+      updated_at:
+        type: string
+    required:
+    - amount
+    - giver
     type: object
   models.HTTP_TOKEN_RESPONSE:
     properties:
@@ -202,8 +222,6 @@ definitions:
       amount:
         type: number
       channel:
-        description: 'Channel         string    `json:"channel" binding:"required"`
-          // TODO: Change to thi one. Once done, this is required'
         type: string
       created_at:
         type: string

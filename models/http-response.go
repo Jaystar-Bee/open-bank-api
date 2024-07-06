@@ -49,9 +49,21 @@ type HTTP_WALLET_RESPONSE struct {
 	Message string         `json:"message"`
 }
 
+type HTTP_REQUEST_RESPONSE_ITEM struct {
+	ID        int64   `json:"id"`
+	Requester USER    `json:"requester"`
+	Giver     USER    `json:"giver" binding:"required"`
+	Amount    float64 `json:"amount" binding:"required"`
+	Status    string  `json:"status"`
+	Remarks   string  `json:"remarks"`
+	CreatedAt string  `json:"created_at"`
+	UpdatedAt string  `json:"updated_at"`
+	DeletedAt string  `json:"deleted_at"`
+}
+
 type HTTP_REQUEST_RESPONSE struct {
-	Data    HTTP_REQUEST `json:"data"`
-	Message string       `json:"message"`
+	Data    []HTTP_REQUEST_RESPONSE_ITEM `json:"data"`
+	Message string                       `json:"message"`
 }
 
 type HTTP_FILE_RESPONSE struct {

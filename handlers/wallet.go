@@ -443,7 +443,16 @@ func GetUserRequests(context *gin.Context) {
 		return
 	}
 	var requests []*models.REQUEST
-	if requestType == models.Request_Giver {
+	if requestType == "" {
+		requests, err = models.GetAllRequests(user_id)
+		if err != nil {
+			context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"message":    "Unable to get requests",
+				"dev_reason": err.Error(),
+			})
+			return
+		}
+	} else if requestType == models.Request_Giver {
 		requests, err = models.GetRequestsToPay(user_id)
 		if err != nil {
 			context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
@@ -462,10 +471,28 @@ func GetUserRequests(context *gin.Context) {
 			return
 		}
 	}
+
+	var response []models.REQUEST_RESPONSE
+
+	for _, request := range requests {
+		giver, _ := models.GetUserByID(request.Giver)
+		requester, _ := models.GetUserByID(request.Requester)
+		response = append(response, models.REQUEST_RESPONSE{
+			ID:        request.ID,
+			Giver:     *giver,
+			Requester: *requester,
+			Amount:    request.Amount,
+			Status:    request.Status,
+			Remarks:   request.Remarks,
+			CreatedAt: request.CreatedAt,
+			UpdatedAt: request.UpdatedAt,
+		})
+	}
+
 	context.JSON(http.StatusOK, gin.H{
 		"message": "Requests fetched successfully",
-		"data":    requests,
-		"count":   len(requests),
+		"data":    response,
+		"count":   len(response),
 	})
 
 }
