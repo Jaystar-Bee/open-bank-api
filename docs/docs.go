@@ -1562,16 +1562,7 @@ const docTemplate = `{
                 "giver": {
                     "type": "integer"
                 },
-                "id": {
-                    "type": "integer"
-                },
                 "remarks": {
-                    "type": "string"
-                },
-                "requester": {
-                    "type": "integer"
-                },
-                "status": {
                     "type": "string"
                 }
             }
@@ -1580,9 +1571,48 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/models.HTTP_REQUEST"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.HTTP_REQUEST_RESPONSE_ITEM"
+                    }
                 },
                 "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.HTTP_REQUEST_RESPONSE_ITEM": {
+            "type": "object",
+            "required": [
+                "amount",
+                "giver"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "number"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "giver": {
+                    "$ref": "#/definitions/models.USER"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "remarks": {
+                    "type": "string"
+                },
+                "requester": {
+                    "$ref": "#/definitions/models.USER"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "updated_at": {
                     "type": "string"
                 }
             }
@@ -1760,7 +1790,6 @@ const docTemplate = `{
                     "type": "number"
                 },
                 "channel": {
-                    "description": "Channel         string    ` + "`" + `json:\"channel\" binding:\"required\"` + "`" + ` // TODO: Change to thi one. Once done, this is required",
                     "type": "string"
                 },
                 "created_at": {

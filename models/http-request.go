@@ -43,12 +43,9 @@ type CHANGE_PASSWORD struct {
 }
 
 type HTTP_REQUEST struct {
-	ID        int64   `json:"id"`
-	Requester int64   `json:"requester"`
-	Giver     int64   `json:"giver" binding:"required"`
-	Amount    float64 `json:"amount" binding:"required"`
-	Status    string  `json:"status"`
-	Remarks   string  `json:"remarks"`
+	Giver   int64   `json:"giver" binding:"required"`
+	Amount  float64 `json:"amount" binding:"required"`
+	Remarks string  `json:"remarks"`
 }
 
 type HTTP_FILE_REQUEST struct {
