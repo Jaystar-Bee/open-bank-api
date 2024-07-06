@@ -10,6 +10,8 @@ func WalletRoutes(server *gin.Engine) {
 
 	walletRoutes := server.Group("/wallet").Use(middlewares.CheckAuthentication)
 	walletRoutes.GET("", handlers.GetWallet)
+	walletRoutes.POST("/money-in", handlers.GetMoneyIn)
+	walletRoutes.POST("/money-out", handlers.GetMoneyOut)
 	walletRoutes.Use(middlewares.CheckAccountActivation)
 	walletRoutes.POST("/send", handlers.SendToUser)
 	walletRoutes.POST("/requests", handlers.RequestMoney)

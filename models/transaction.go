@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/Jaystar-Bee/open-bank-api/db"
@@ -133,4 +134,32 @@ func GetTransactionByID(id int64) (*TRANSACTION_RESPONSE[*USER_RESPONSE], error)
 	transaction.Sender, _ = GetUserByID(sender)
 	transaction.Receiver, _ = GetUserByID(receiver)
 	return &transaction, nil
+}
+
+func GetMoneyIn(userId int64) (float64, error) {
+	query := `SELECT SUM(amount) FROM transactions WHERE receiver = $1 AND status = $2`
+
+	var amount sql.NullFloat64
+	err := db.MainDB.QueryRow(query, userId, Transaction_completed).Scan(&amount)
+	if err != nil {
+		return 0, err
+	}
+	if amount.Valid {
+		return amount.Float64, nil
+	}
+	return 0, nil
+}
+
+func GetMoneyOut(userId int64) (float64, error) {
+	query := `SELECT SUM(amount) FROM transactions WHERE sender = $1 AND status = $2`
+
+	var amount sql.NullFloat64
+	err := db.MainDB.QueryRow(query, userId, Transaction_completed).Scan(&amount)
+	if err != nil {
+		return 0, err
+	}
+	if amount.Valid {
+		return amount.Float64, nil
+	}
+	return 0, nil
 }
