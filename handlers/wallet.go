@@ -776,3 +776,76 @@ func ConfirmRequest(context *gin.Context) {
 	})
 
 }
+
+// GetMoneyIn godoc
+//
+//	@Summary		Get Money In
+//	@Description	Get Money In
+//	@Tags			Wallet
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	models.HTTP_MONEY_IN_RESPONSE	"Money In calculated successfully"
+//	@Failure		400	{object}	models.Error					"Unable to process request"
+//	@Failure		404	{object}	models.Error					"User not found"
+//	@Failure		500	{object}	models.Error					"Error while calculating money in"
+//	@Router			/wallet/money-in [get]
+func GetMoneyIn(context *gin.Context) {
+	var user_id = context.GetInt64("user")
+
+	_, err := models.GetUserByID(user_id)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+			"message": "User not found",
+		})
+		return
+	}
+
+	amount, err := models.GetMoneyIn(user_id)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "Error while calculating money in",
+		})
+		return
+	}
+	context.JSON(http.StatusOK, gin.H{
+		"message": "Money in calculated successfully",
+		"data":    amount,
+	})
+
+}
+
+// GetMoneyOut godoc
+//
+//	@Summary		Get Money Out
+//	@Description	Get Money Out
+//	@Tags			Wallet
+//	@Accept			json
+//	@Produce		json
+//	@Success		200	{object}	models.HTTP_MONEY_IN_RESPONSE	"Money Out calculated successfully"
+//	@Failure		400	{object}	models.Error					"Unable to process request"
+//	@Failure		404	{object}	models.Error					"User not found"
+//	@Failure		500	{object}	models.Error					"Error while calculating money out"
+//	@Router			/wallet/money-out [get]
+func GetMoneyOut(context *gin.Context) {
+	var user_id = context.GetInt64("user")
+
+	_, err := models.GetUserByID(user_id)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusNotFound, gin.H{
+			"message": "User not found",
+		})
+		return
+	}
+
+	amount, err := models.GetMoneyOut(user_id)
+	if err != nil {
+		context.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"message": "Error while calculating money out",
+		})
+		return
+	}
+	context.JSON(http.StatusOK, gin.H{
+		"message": "Money out calculated successfully",
+		"data":    amount,
+	})
+}

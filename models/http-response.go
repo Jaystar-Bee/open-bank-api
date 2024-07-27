@@ -70,3 +70,8 @@ type HTTP_FILE_RESPONSE struct {
 	Data    string `json:"data"`
 	Message string `json:"message"`
 }
+
+type HTTP_MONEY_IN_RESPONSE struct {
+	Data    float64 `json:"data"`
+	Message string  `json:"message"`
+}

@@ -299,6 +299,11 @@ const docTemplate = `{
         },
         "/user/edit": {
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Edit User",
                 "consumes": [
                     "application/json"
@@ -1073,6 +1078,88 @@ const docTemplate = `{
                 }
             }
         },
+        "/wallet/money-in": {
+            "get": {
+                "description": "Get Money In",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "Get Money In",
+                "responses": {
+                    "200": {
+                        "description": "Money In calculated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/models.HTTP_MONEY_IN_RESPONSE"
+                        }
+                    },
+                    "400": {
+                        "description": "Unable to process request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Error while calculating money in",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/wallet/money-out": {
+            "get": {
+                "description": "Get Money Out",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Wallet"
+                ],
+                "summary": "Get Money Out",
+                "responses": {
+                    "200": {
+                        "description": "Money Out calculated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/models.HTTP_MONEY_IN_RESPONSE"
+                        }
+                    },
+                    "400": {
+                        "description": "Unable to process request",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Error while calculating money out",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/wallet/requests": {
             "get": {
                 "security": [
@@ -1544,6 +1631,17 @@ const docTemplate = `{
         "models.HTTP_MESSAGE_ONLY_RESPONSE": {
             "type": "object",
             "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.HTTP_MONEY_IN_RESPONSE": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "number"
+                },
                 "message": {
                     "type": "string"
                 }

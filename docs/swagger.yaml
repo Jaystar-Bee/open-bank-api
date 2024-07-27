@@ -69,6 +69,13 @@ definitions:
       message:
         type: string
     type: object
+  models.HTTP_MONEY_IN_RESPONSE:
+    properties:
+      data:
+        type: number
+      message:
+        type: string
+    type: object
   models.HTTP_REQUEST:
     properties:
       amount:
@@ -634,6 +641,8 @@ paths:
           description: Unable to process request
           schema:
             $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
       summary: Edit User
       tags:
       - User
@@ -1072,6 +1081,60 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Deposit money
+      tags:
+      - Wallet
+  /wallet/money-in:
+    get:
+      consumes:
+      - application/json
+      description: Get Money In
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Money In calculated successfully
+          schema:
+            $ref: '#/definitions/models.HTTP_MONEY_IN_RESPONSE'
+        "400":
+          description: Unable to process request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Error while calculating money in
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get Money In
+      tags:
+      - Wallet
+  /wallet/money-out:
+    get:
+      consumes:
+      - application/json
+      description: Get Money Out
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Money Out calculated successfully
+          schema:
+            $ref: '#/definitions/models.HTTP_MONEY_IN_RESPONSE'
+        "400":
+          description: Unable to process request
+          schema:
+            $ref: '#/definitions/models.Error'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Error while calculating money out
+          schema:
+            $ref: '#/definitions/models.Error'
+      summary: Get Money Out
       tags:
       - Wallet
   /wallet/requests:

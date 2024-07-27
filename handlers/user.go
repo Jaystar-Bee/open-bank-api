@@ -336,6 +336,9 @@ func CreateUser(context *gin.Context) {
 //	@Tags			User
 //	@Accept			json
 //	@Produce		json
+//
+// @Security		ApiKeyAuth
+//
 //	@Param			user	body		models.USER_EDIT					true	"Edit User"
 //	@Success		200		{object}	models.HTTP_MESSAGE_ONLY_RESPONSE	"User updated successfully"
 //	@Failure		400		{object}	models.Error						"Unable to process request"
