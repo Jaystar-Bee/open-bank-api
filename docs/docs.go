@@ -299,6 +299,11 @@ const docTemplate = `{
         },
         "/user/edit": {
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Edit User",
                 "consumes": [
                     "application/json"

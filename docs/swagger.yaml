@@ -641,6 +641,8 @@ paths:
           description: Unable to process request
           schema:
             $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
       summary: Edit User
       tags:
       - User
